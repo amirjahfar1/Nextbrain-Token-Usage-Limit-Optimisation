@@ -3,7 +3,7 @@
 Roles, not names. Names live in `config/defaults.conf` (owner-configurable, dated).
 
 ## L1 Three roles
-`planner` (strongest, for plans only), `executor` (edits, tests, debugging, reviews), `economy` (read-only lookups).
+`planner` (strongest, for plans only; use it only when the owner asks for it by name, never pick it yourself), `executor` (edits, tests, debugging, reviews), `economy` (read-only lookups).
 
 ## L2 Plan once, hand off short
 The planner ends with: scope, decisions, open questions, acceptance checks. The executor receives that short plan, not the planning chat.

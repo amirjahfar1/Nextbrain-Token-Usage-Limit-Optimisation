@@ -17,3 +17,6 @@ Editing instruction files, tool setup or model mid-chat can break cache reuse. B
 
 ## S6 Clear between unrelated tasks
 Unrelated work gets its own chat; old history is paid for on every turn.
+
+## S7 Hand off, do not drag
+`/handoff` (Codex `$handoff`) writes a checkpoint from `templates/handoff.md`. Use it at a clean boundary or when `/context` shows the chat is large; pick your own trigger from real readings (one project proposes about 250k, a heuristic). The owner clears the chat.

@@ -19,4 +19,4 @@ Rule: open the parent only, then ONE child. Never a whole folder.
 | Child | `rules/subagents.md`, `commands.md`, `codex.md`, `core.md` | delegating / client commands / Codex / always-on rules |
 | Registry | `skill/tips/registry.tsv` | never opened by hand; `/tips` prints it |
 
-Commands: `/tips` (all tips), `/token-audit` (read-only audit). Big shards: `rg -l '<id>' <shard dir>`, then open that one shard.
+Commands: `/tips` (all tips), `/token-audit` (read-only audit), `/handoff` (checkpoint before clearing). Big shards: `rg -l '<id>' <shard dir>`, then open that one shard.

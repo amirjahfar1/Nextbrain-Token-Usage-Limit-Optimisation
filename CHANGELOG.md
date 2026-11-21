@@ -9,3 +9,6 @@
 
 ## 0.2.0 (2026-11-21)
 - Added `/token-audit` command (read-only audit) and MAP.md (which file to open when).
+
+## 0.3.0 (2026-11-21)
+- Added `/handoff` command and template; selective install (`--hooks=all|guard|none`, `enforce_size=0`); adoption notes (selective adoption, transcript policy, JSON trap); planner model only when the owner names it.

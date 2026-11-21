@@ -20,3 +20,8 @@ Decisions: **keep** (existing wins, drop ours), **replace line** (edit the exist
 
 ## Stop and ask
 Existing hooks on the same events; invalid settings JSON; managed settings; a rule that would be deleted; a deny rule that would block a workflow; any failing check.
+
+## Adopt selectively
+Take only what fits. An owner may reject size limits, model roles or session hooks: set `enforce_size=0`, leave `role_*` unused, install `--hooks=guard` or `--hooks=none`. The project's own rules win; never copy a rule the owner declined.
+- If project rules forbid reading session transcripts, skip the SessionEnd/SessionStart hooks (`--hooks=guard`). The cost report reads transcripts locally; do not run it where that is banned.
+- Use a planning model only when the owner names it in that message.

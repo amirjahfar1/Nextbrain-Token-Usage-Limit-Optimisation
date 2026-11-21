@@ -24,7 +24,7 @@ Tip areas (generated):
 - bigfiles (6 tips) -> rules/bigfiles.md
 - mcp (5 tips) -> rules/mcp.md
 - models (5 tips) -> rules/models.md
-- session (6 tips) -> rules/session.md
+- session (7 tips) -> rules/session.md
 - measure (3 tips) -> rules/measure.md
 - review (6 tips) -> rules/session-review.md
 - codex (2 tips) -> rules/codex.md

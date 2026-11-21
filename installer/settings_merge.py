@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Additive merge of settings.snippet.json into .claude/settings.json.
-Usage: settings_merge.py <project> merge|remove [--dry-run]. Never edits other keys. Aborts on invalid JSON."""
+Usage: settings_merge.py <project> merge|remove [--dry-run] [--events=PreToolUse,...]. Never edits other keys. Aborts on invalid JSON."""
 import json, os, shutil, sys, time
 
 MARK = "token-optimisation/hooks/"
@@ -14,6 +14,7 @@ except ValueError:
     sys.exit("settings.json is invalid JSON; not touching it. Merge installer/settings.snippet.json by hand.")
 if not isinstance(cur, dict):
     sys.exit("settings.json is not an object; not touching it.")
+only = next((a.split("=",1)[1].split(",") for a in sys.argv if a.startswith("--events=")), None)
 added = []
 deny = cur.setdefault("permissions", {}).setdefault("deny", [])
 hooks = cur.setdefault("hooks", {})
@@ -22,6 +23,8 @@ if mode == "merge":
         if r not in deny:
             deny.append(r); added.append("deny " + r)
     for ev, entries in snip["hooks"].items():
+        if only is not None and ev not in only:
+            continue
         have = json.dumps(hooks.get(ev, []))
         for e in entries:
             script = e["hooks"][0]["command"].split("hooks/")[-1].rstrip('"')

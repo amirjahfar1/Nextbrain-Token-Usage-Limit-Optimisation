@@ -22,3 +22,6 @@ Fresh `/context` and `/usage` against the baseline (rules/measure.md X3). Revert
 ## Roll back
 - One change: restore the file from `.claude/token-optimisation/backups/<time>/`.
 - Everything: `sh install.sh --uninstall <project>` removes the block, our hooks and deny rules, and the vendored skill. Other settings stay.
+
+## JSON trap
+After any hand edit of a settings file run `python3 -m json.tool <file>`. One stray comma invalidates the file and silently drops every deny rule and hook.
