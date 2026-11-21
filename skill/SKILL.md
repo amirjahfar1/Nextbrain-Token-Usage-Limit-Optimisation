@@ -11,7 +11,7 @@ Open ONE child for the situation, never all. Print every tip with `sh scripts/ti
 - Connectors and plugins: `rules/mcp.md`
 - Model and effort: `rules/models.md`
 - Context, checkpoint, cache: `rules/session.md`, `rules/measure.md`
-- Flagged expensive session: `rules/session-review.md`
+- Flagged expensive session: `rules/session-review.md`. Using `/token-audit` and its report: `guides/token-audit.md`
 - Subagents: `rules/subagents.md`. Codex: `rules/codex.md`. Commands: `rules/commands.md`. Always-on: `rules/core.md`
 
 Tip areas (generated):

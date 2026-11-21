@@ -18,3 +18,6 @@
 
 ## 0.4.0 (2026-11-21)
 - Cumulative usage report: sessions.jsonl per session, report.py builds report.md (what uses the most, repeat offenders, suggestions); /token-audit runs it; --last now scopes to the current project.
+
+## 0.4.1 (2026-11-21)
+- Added guides/token-audit.md: how to run /token-audit, where data comes from, how to read and act on the report.
