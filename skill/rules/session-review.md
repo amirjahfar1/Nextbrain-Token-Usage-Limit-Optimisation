@@ -16,3 +16,6 @@ Under 10 recorded sessions no numeric flag is raised; only structural flags (rep
 
 ## V5 Learn
 If the review exposes a new lesson, add a registry row and child heading (`scripts/gen-tips.sh --check`).
+
+## V6 Audit on demand
+`/token-audit` (Codex `$token-audit`) runs `scripts/audit.sh`: last-session cost, pending review, guard log, big files, over-limit docs, connector reminder. Read-only.

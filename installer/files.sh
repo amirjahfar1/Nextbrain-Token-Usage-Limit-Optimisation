@@ -25,15 +25,15 @@ sync() {
 }
 case "$op" in
   install|update)
-    sync "$repo/skill" token-optimisation; sync "$repo/skill-tips" tips
+    sync "$repo/skill" token-optimisation; sync "$repo/skill-tips" tips; sync "$repo/skill-audit" token-audit
     if [ -z "$dry" ]; then
       cp "$repo/VERSION" "$sk/token-optimisation/VERSION"
-      (cd "$sk" && for n in token-optimisation tips; do [ -f "$n/.managed" ] && find "$n" -type f -not -name .manifest -not -name .managed | while read -r f; do echo "$(hash "$f")  $f"; done; done) > "$man"
+      (cd "$sk" && for n in token-optimisation tips token-audit; do [ -f "$n/.managed" ] && find "$n" -type f -not -name .manifest -not -name .managed | while read -r f; do echo "$(hash "$f")  $f"; done; done) > "$man"
       [ -f "$proj/.agents/token-optimisation.conf" ] || printf '# project overrides for token-optimisation (defaults: skill/config/defaults.conf)\nguard_mode=log\nranged=\n' > "$proj/.agents/token-optimisation.conf"
     fi
-    link token-optimisation; link tips ;;
+    link token-optimisation; link tips; link token-audit ;;
   remove)
-    for n in token-optimisation tips; do
+    for n in token-optimisation tips token-audit; do
       if [ -f "$sk/$n/.managed" ]; then rm -rf "${sk:?}/${n:?}"; rm -f "$proj/.claude/skills/$n"; fi
     done ;;
   check)

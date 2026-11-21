@@ -6,3 +6,6 @@
 
 ## 0.1.1 (2026-11-21)
 - mcp.md verified against docs: per-project /mcp toggle, bare-name deny removes tools from context.
+
+## 0.2.0 (2026-11-21)
+- Added `/token-audit` command (read-only audit) and MAP.md (which file to open when).

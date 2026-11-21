@@ -57,3 +57,4 @@ Q6	requests	Use plan mode for ambiguous, multi-module or high-impact changes; sm
 W1	commands	Claude Code: /context /usage /compact /clear /plan /mcp /rename /doctor /skill-doctor /tips.	using Claude Code	rules/commands.md#W1	rule
 W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	using Codex	rules/commands.md#W2	rule
 M5	mcp	Deny a bare mcp__<server> in permissions to drop its tools from context; scoped rules only block calls.	connector overhead	rules/mcp.md#M5	deny
+V6	review	Run /token-audit any time: overhead, big files, guard log, connectors. Read-only.	anytime	rules/session-review.md#V6	script
