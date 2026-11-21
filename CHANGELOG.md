@@ -24,3 +24,6 @@
 
 ## 0.4.2 (2026-11-21)
 - tips.sh groups each area once (no repeated headings).
+
+## 0.4.3 (2026-11-21)
+- Rule K6: universal lessons from any project are fed back to this repo, generic only.

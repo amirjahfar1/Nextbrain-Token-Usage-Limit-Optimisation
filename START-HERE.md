@@ -12,4 +12,5 @@ Rules for you:
 - Open one child file per situation, never the whole repo.
 - Never delete or weaken an existing rule, hook or connector without the owner's yes.
 - Reply in short Roman Urdu when the owner writes Roman Urdu. Files stay English.
+- When you optimise a project and learn something universal, feed it back here (`skill/rules/core.md` K6): generic only, no project details.
 - No file here is big (limits in `skill/config/defaults.conf`). Keep it so: `sh scripts/check-repo.sh`.

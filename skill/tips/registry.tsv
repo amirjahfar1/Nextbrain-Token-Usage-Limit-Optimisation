@@ -59,3 +59,4 @@ W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	
 M5	mcp	Deny a bare mcp__<server> in permissions to drop its tools from context; scoped rules only block calls.	connector overhead	rules/mcp.md#M5	deny
 V6	review	Run /token-audit any time: overhead, big files, guard log, connectors. Read-only.	anytime	rules/session-review.md#V6	script
 S7	session	Run /handoff to write a checkpoint before clearing; the owner decides when to clear.	large context	rules/session.md#S7	script
+K6	core	Universal token lessons from any project go back to the shared optimisation repo, stripped of project details.	after optimising a project	rules/core.md#K6	rule

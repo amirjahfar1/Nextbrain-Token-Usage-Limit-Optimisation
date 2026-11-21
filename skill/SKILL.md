@@ -16,7 +16,7 @@ Open ONE child for the situation, never all. Print every tip with `sh scripts/ti
 
 Tip areas (generated):
 <!-- TIPS:BEGIN -->
-- core (5 tips) -> rules/core.md
+- core (6 tips) -> rules/core.md
 - reading (6 tips) -> rules/reading.md
 - requests (6 tips) -> rules/requests.md
 - output (3 tips) -> rules/output.md
