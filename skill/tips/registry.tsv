@@ -56,3 +56,4 @@ C2	codex	Codex reads .agents/skills; Claude Code reads the .claude/skills symlin
 Q6	requests	Use plan mode for ambiguous, multi-module or high-impact changes; small clear ones just proceed.	risky change	rules/requests.md#Q6	rule
 W1	commands	Claude Code: /context /usage /compact /clear /plan /mcp /rename /doctor /skill-doctor /tips.	using Claude Code	rules/commands.md#W1	rule
 W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	using Codex	rules/commands.md#W2	rule
+M5	mcp	Deny a bare mcp__<server> in permissions to drop its tools from context; scoped rules only block calls.	connector overhead	rules/mcp.md#M5	deny
