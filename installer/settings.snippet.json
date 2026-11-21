@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/pnpm-lock.yaml)",
+      "Read(**/package-lock.json)",
+      "Read(**/yarn.lock)",
+      "Read(**/*.min.js)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [{"matcher": "Read", "hooks": [{"type": "command",
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/guard_read.py"}]}],
+    "SessionStart": [{"hooks": [{"type": "command",
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/session_start.py"}]}],
+    "SessionEnd": [{"hooks": [{"type": "command", "timeout": 15,
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/session_end.py"}]}]
+  }
+}

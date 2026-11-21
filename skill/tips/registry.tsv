@@ -1,0 +1,58 @@
+# id	area	tip	trigger	file#anchor	enforced_by
+K1	core	Entry files stay tiny indexes; details are opened only when their trigger fires.	any request	rules/core.md#K1	rule
+K2	core	One owner per rule: merge instead of duplicating, resolve conflicts in place.	editing instructions	rules/core.md#K2	rule
+K3	core	No big files: split into parent index plus small children in the same change.	file over limit	rules/core.md#K3	script
+K4	core	Never invent token counts or percentages; label thresholds as heuristics.	reporting usage	rules/core.md#K4	rule
+K5	core	Optimise safely: verify, back up, ask before removing existing rules or hooks.	any optimisation	rules/core.md#K5	rule
+R1	reading	Locate first (CODEMAP, code graph, grep -n); never scan the whole tree.	before reading	rules/reading.md#R1	rule
+R2	reading	Read ranges with offset/limit; 2-5 files per task, else re-locate.	reading code	rules/reading.md#R2	hook
+R3	reading	Cap command output with head/tail; send long logs to a file and grep.	running commands	rules/reading.md#R3	rule
+R4	reading	Never re-read a file already in context or one you just edited.	before reading	rules/reading.md#R4	rule
+R5	reading	Query lockfiles and generated files with CLIs; never open them.	big generated file	rules/reading.md#R5	deny
+R6	reading	Source already printed by a tool counts as read; do not open it again.	after a tool printed code	rules/reading.md#R6	rule
+Q1	requests	Tiny clear request: say it back in one line, then do it.	small clear task	rules/requests.md#Q1	rule
+Q2	requests	Bigger request: short plan, will-not-touch line, 1-3 questions with defaults, wait for yes.	bigger task	rules/requests.md#Q2	rule
+Q3	requests	Do not re-ask what docs, requirements or earlier answers settle.	before asking	rules/requests.md#Q3	rule
+Q4	requests	Batch related edits, evidence and checks into one message.	multi-part work	rules/requests.md#Q4	rule
+Q5	requests	Finish with three facts: changed, checked, not checked.	end of task	rules/requests.md#Q5	rule
+O1	output	No recaps of what the diff or tool output already shows.	writing a reply	rules/output.md#O1	rule
+O2	output	Cite path:line; never paste file contents, logs or long diffs.	writing a reply	rules/output.md#O2	rule
+O3	output	Roman Urdu replies when the owner uses it; files stay English.	any reply	rules/output.md#O3	rule
+A1	subagents	Broad search across unknown files goes to an Explore subagent; keep the conclusion.	owner unknown	rules/subagents.md#A1	rule
+A2	subagents	Send independent tool calls in parallel in one message.	several lookups	rules/subagents.md#A2	rule
+A3	subagents	Use the economy model role for read-only helpers.	delegating	rules/subagents.md#A3	rule
+A4	subagents	Do not delegate lookups that take 1-3 calls.	small lookup	rules/subagents.md#A4	rule
+B1	bigfiles	Classify oversized files: never, ranged or split.	scan result	rules/bigfiles.md#B1	script
+B2	bigfiles	never files are denied; query them with CLIs or grep -n -m.	lockfile or build output	rules/bigfiles.md#B2	deny
+B3	bigfiles	ranged files: index once, then get one slice of at most 120 lines.	large source file	rules/bigfiles.md#B3	hook
+B4	bigfiles	split docs by H2 into shards; the original becomes a parent index.	oversized doc	rules/bigfiles.md#B4	script
+B5	bigfiles	Generated shards are never hand-edited; change the source and regenerate.	generated file	rules/bigfiles.md#B5	rule
+B6	bigfiles	A new file over the limit is split in the same change.	writing a file	rules/bigfiles.md#B6	script
+M1	mcp	Measure connector and tool-list overhead with /context at session start.	session start	rules/mcp.md#M1	rule
+M2	mcp	Disable unused MCP servers and connectors per project, with owner approval.	many connectors	rules/mcp.md#M2	rule
+M3	mcp	Prefer a local CLI over a connector for routine queries.	choosing a tool	rules/mcp.md#M3	rule
+M4	mcp	Personal enable/disable choices go in settings.local.json.	changing settings	rules/mcp.md#M4	rule
+L1	models	Route by role (planner, executor, economy); names live in config only.	choosing a model	rules/models.md#L1	rule
+L2	models	Planner hands a short plan with acceptance checks to the executor.	planning to doing	rules/models.md#L2	rule
+L3	models	Do not switch model mid-slice; it can force an uncached re-read.	model switch	rules/models.md#L3	rule
+L4	models	If a configured model is unavailable, ask before substituting.	model missing	rules/models.md#L4	rule
+L5	models	Match reasoning effort to the task; keep standard speed to save usage.	starting a task	rules/models.md#L5	rule
+S1	session	One slice per session; fresh chat at a clean boundary.	new task	rules/session.md#S1	rule
+S2	session	Checkpoint (goal, decisions, files, checks, next action) before compact or clear.	context growing	rules/session.md#S2	rule
+S3	session	Heads-up near 65% (Claude) or 60% (Codex) used; label as heuristic.	context meter	rules/session.md#S3	rule
+S4	session	After a long break checkpoint first; never ping just to warm the cache.	resuming	rules/session.md#S4	hook
+S5	session	Keep the prefix stable: batch instruction, tool and model changes at a boundary.	editing config	rules/session.md#S5	rule
+S6	session	Unrelated tasks get their own chat.	new unrelated task	rules/session.md#S6	rule
+X1	measure	Record /context and /usage at start and end in baseline.md.	session start or end	rules/measure.md#X1	rule
+X2	measure	First-request input size is the fixed overhead; session_cost.py prints it.	checking overhead	rules/measure.md#X2	script
+X3	measure	Keep an optimisation only if it beats the baseline.	after a change	rules/measure.md#X3	rule
+V1	review	Run cost_report.py when a session is flagged expensive.	pending-review	rules/session-review.md#V1	hook
+V2	review	Explain the cost drivers and map each suggestion to a tip id.	after the report	rules/session-review.md#V2	script
+V3	review	Apply suggestions only with owner yes: smallest diff, backup, verify.	before changing files	rules/session-review.md#V3	rule
+V4	review	Under 10 recorded sessions raise only structural flags, no numeric ones.	calibration	rules/session-review.md#V4	script
+V5	review	Add a registry row when a review teaches a new lesson.	after a review	rules/session-review.md#V5	rule
+C1	codex	Codex is instruction-only in v1; use $tips, /status, /compact, /plan, /model, /mcp.	using Codex	rules/codex.md#C1	rule
+C2	codex	Codex reads .agents/skills; Claude Code reads the .claude/skills symlink.	installing	rules/codex.md#C2	rule
+Q6	requests	Use plan mode for ambiguous, multi-module or high-impact changes; small clear ones just proceed.	risky change	rules/requests.md#Q6	rule
+W1	commands	Claude Code: /context /usage /compact /clear /plan /mcp /rename /doctor /skill-doctor /tips.	using Claude Code	rules/commands.md#W1	rule
+W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	using Codex	rules/commands.md#W2	rule

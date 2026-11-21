@@ -1,0 +1,5 @@
+- Token rules (`.agents/skills/token-optimisation/`): read 2-5 files per task, with ranges, never re-read; cap command output.
+- Tiny clear request: say it back in one line and do it. Bigger: short plan, 1-3 questions with defaults, wait for yes.
+- No recaps or file dumps in replies. Guarded big files are queried, not opened (`rules/bigfiles.md`).
+- `/tips` (Claude) or `$tips` (Codex) lists every optimisation; open one child file per situation.
+- Flagged expensive session: offer `rules/session-review.md`.
