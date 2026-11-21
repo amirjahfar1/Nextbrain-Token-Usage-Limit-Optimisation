@@ -18,4 +18,4 @@ Under 10 recorded sessions no numeric flag is raised; only structural flags (rep
 If the review exposes a new lesson, add a registry row and child heading (`scripts/gen-tips.sh --check`).
 
 ## V6 Audit on demand
-`/token-audit` (Codex `$token-audit`) runs `scripts/audit.sh`: last-session cost, pending review, guard log, big files, over-limit docs, connector reminder. Read-only.
+`/token-audit` (Codex `$token-audit`) runs `scripts/audit.sh`: it builds `.claude/token-optimisation/report.md` (last sessions, what uses the most, repeat offenders, tip suggestions), then lists guard log, big files and over-limit docs. Sessions are recorded by the SessionEnd hook into `sessions.jsonl`; `--backfill` fills past ones.

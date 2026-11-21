@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Short expensive-session report. Usage: cost_report.py <transcript>|--last [--record STATE_DIR]"""
-import glob, os, sys, time
+import glob, json, os, re, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from session_cost import compute
 
@@ -59,12 +59,20 @@ def report(c, flags, tips, status):
     return "\n".join(out[:15])
 
 
+def make_row(path, c, flags):
+    return {"ts": int(time.time()), "session": os.path.basename(path)[:36], "requests": c["requests"],
+            "peak_context": c["peak_context"], "fixed_overhead": c["fixed_overhead"], "models": c["models"],
+            "tool_result_chars": c["tool_result_chars"], "mcp_result_chars": c["mcp_result_chars"],
+            "by_tool": c["result_by_tool"], "top": [[n, str(t)[:50], z] for z, n, t in c["top_results"][:3]],
+            "repeated_reads": c["repeated_full_reads"], "compactions": c["compactions"], "flags": flags}
+
+
 def main(argv):
     state = argv[argv.index("--record") + 1] if "--record" in argv else ".claude/token-optimisation"
     p = argv[1] if len(argv) > 1 else "--last"
     if p == "--last":
         base = os.path.expanduser("~/.claude/projects")
-        fs = glob.glob(os.path.join(base, "*", "*.jsonl"))
+        fs = glob.glob(os.path.join(base, re.sub(r"[^A-Za-z0-9]", "-", os.getcwd()), "*.jsonl")) or glob.glob(os.path.join(base, "*", "*.jsonl"))
         p = max(fs, key=os.path.getmtime) if fs else ""
     c = compute(p)
     flags, tips, status = analyse(c, state)
@@ -76,6 +84,8 @@ def main(argv):
             if new:
                 fh.write("ts\tsession\tpeak_context\ttool_result_chars\trequests\tflags\n")
             fh.write("%d\t%s\t%s\t%s\t%s\t%s\n" % (time.time(), os.path.basename(p)[:36], c["peak_context"] or 0, c["tool_result_chars"], c["requests"], ";".join(flags)))
+        with open(os.path.join(state, "sessions.jsonl"), "a") as fh:
+            fh.write(json.dumps(make_row(p, c, flags)) + "\n")
         if flags:
             with open(os.path.join(state, "pending-review"), "w") as fh:
                 fh.write(p + "\n" + report(c, flags, tips, status) + "\n")

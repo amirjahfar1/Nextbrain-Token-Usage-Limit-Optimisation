@@ -15,3 +15,6 @@
 
 ## 0.3.1 (2026-11-21)
 - split-md packs small sections into ~5 KB shards and fixes relative links. Rule: docs read by line range are class `ranged`, not split.
+
+## 0.4.0 (2026-11-21)
+- Cumulative usage report: sessions.jsonl per session, report.py builds report.md (what uses the most, repeat offenders, suggestions); /token-audit runs it; --last now scopes to the current project.

@@ -63,7 +63,7 @@ def compute(path):
         "output": sum(int(u.get("output_tokens") or 0) for u in usage.values()),
         "peak_context": max(ins) if ins else None, "fixed_overhead": first,
         "tool_calls": dict(calls.most_common(8)), "tool_result_chars": sum(res.values()),
-        "top_results": sorted(results, reverse=True)[:5],
+        "top_results": sorted(results, reverse=True)[:5], "result_by_tool": dict(res.most_common(6)),
         "repeated_full_reads": {k: v for k, v in reads.items() if v >= 2},
         "mcp_calls": sum(v for k, v in calls.items() if k.startswith("mcp__")),
         "mcp_result_chars": sum(mcp.values()), "sidechain_lines": side, "compactions": compact,
