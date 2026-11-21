@@ -21,3 +21,6 @@
 
 ## 0.4.1 (2026-11-21)
 - Added guides/token-audit.md: how to run /token-audit, where data comes from, how to read and act on the report.
+
+## 0.4.2 (2026-11-21)
+- tips.sh groups each area once (no repeated headings).
