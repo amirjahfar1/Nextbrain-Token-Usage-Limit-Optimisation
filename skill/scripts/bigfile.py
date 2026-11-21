@@ -73,22 +73,36 @@ def get(f, key):
     print("\n".join(ls[a - 1:min(b, a + CAP - 1)]))
 
 
+def fix_links(text):
+    """Shards live one folder deeper: prefix relative markdown links with ../ (anchors and URLs untouched)."""
+    return re.sub(r"\]\((?!https?:|#|/|mailto:|\.\./)([^)\s]+)\)", r"](../\1)", text)
+
+
 def split_md(f, apply):
     ls = lines_of(f)
     cuts = [i for i, l in enumerate(ls) if l.startswith("## ")] + [len(ls)]
     if len(cuts) < 3:
         sys.exit("fewer than 2 H2 sections; nothing to split")
     base = os.path.splitext(f)[0]
-    parts = [(ls[a][3:].strip(), ls[a:b]) for a, b in zip(cuts, cuts[1:])]
-    idx = ls[:cuts[0]] + ["", "Split into small files. Open only the one you need:", ""]
-    for n, (t, body) in enumerate(parts, 1):
-        slug = re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-")[:40] or "part"
+    secs = [(ls[a][3:].strip(), ls[a:b]) for a, b in zip(cuts, cuts[1:])]
+    packs, cur, size = [], [], 0  # pack small adjacent sections up to ~5 KB per shard
+    for t, body in secs:
+        n = sum(len(x) + 1 for x in body)
+        if cur and size + n > 5000:
+            packs.append(cur); cur, size = [], 0
+        cur.append((t, body)); size += n
+    packs.append(cur)
+    idx = ls[:cuts[0]] + ["", "Split into small files. Open only the shard you need:", ""]
+    for n, pack in enumerate(packs, 1):
+        slug = re.sub(r"[^a-z0-9]+", "-", pack[0][0].lower()).strip("-")[:40] or "part"
         rel = "%s/%02d-%s.md" % (os.path.basename(base), n, slug)
-        idx.append("- [%s](%s) (%d lines)" % (t, rel, len(body)))
-        print("%s%s  %d lines%s" % ("write " if apply else "plan  ", rel, len(body), "  (over limit: split further by H3)" if len(body) > 100 else ""))
+        titles = "; ".join(t for t, _ in pack)
+        lines = [x for _, body in pack for x in body]
+        idx.append("- [%s](%s): %s" % (os.path.basename(rel), rel, titles))
+        print("%s%s  %d lines" % ("write " if apply else "plan  ", rel, len(lines)))
         if apply:
             os.makedirs(base, exist_ok=True)
-            open(os.path.join(os.path.dirname(f), rel), "w").write("\n".join(body).rstrip() + "\n")
+            open(os.path.join(os.path.dirname(f), rel), "w").write(fix_links("\n".join(lines).rstrip()) + "\n")
     if apply:
         open(f, "w").write("\n".join(idx) + "\n")
     else:

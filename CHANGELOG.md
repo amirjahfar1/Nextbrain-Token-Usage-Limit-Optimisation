@@ -12,3 +12,6 @@
 
 ## 0.3.0 (2026-11-21)
 - Added `/handoff` command and template; selective install (`--hooks=all|guard|none`, `enforce_size=0`); adoption notes (selective adoption, transcript policy, JSON trap); planner model only when the owner names it.
+
+## 0.3.1 (2026-11-21)
+- split-md packs small sections into ~5 KB shards and fixes relative links. Rule: docs read by line range are class `ranged`, not split.
