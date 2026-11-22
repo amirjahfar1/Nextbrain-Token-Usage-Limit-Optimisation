@@ -17,6 +17,8 @@ Needs Claude Code 2.1.287+ (desktop app 2.1.286+). In Claude Code, with this rep
 ```
 Then check `/plugin` that the scope is user, and try `/savings`. Update: `/plugin marketplace update nextbrain-mods`, `/reload-plugins`.
 
+No slash commands needed: the same works from a terminal with `claude plugin marketplace add <path>/mods` and `claude plugin install <name>@nextbrain-mods` (scope user). The desktop app ships its own binary under `~/Library/Application Support/Claude/claude-code/<version>/*/claude.app/Contents/MacOS/claude`. Check with `claude plugin list` and `claude plugin validate <path>/mods`. A chat that was open before the install needs `/reload-plugins` or a new chat.
+
 ## Which mod owns which rule (one owner each, K2)
 | Mod | Rules it serves | What it does | Note |
 |---|---|---|---|
@@ -29,7 +31,7 @@ Then check `/plugin` that the scope is user, and try `/savings`. Update: `/plugi
 Without a mod (Codex, other clients, or mod off) the rule alone applies: follow it by hand.
 
 ## Honest limits
-- Not tested in this repo: install and try each mod once, then run `/savings` to confirm it counts.
+- Checked 2026-11-23 on Claude Code 2.1.330: all five install (scope user), validate, and their hooks fire in a headless run (`~/.claude/mods-logs/model-router.log`, `savings-proof.log`). Not yet seen: the panes, a real subagent route, a handoff. Try `/savings` in a chat to confirm.
 - Unlike the original pack there is no `/mods` switchboard, `input-router`, `effort-optimizer` or `efficient-browser-use`. To turn a mod off use `/plugin`.
 - Haiku does the reading in model-router and research-router, so a small helper cost shows in `/savings`. Notes can be wrong: for exact work use the real tool.
 - Keep this repo private: only `model-router` has a confirmed licence.

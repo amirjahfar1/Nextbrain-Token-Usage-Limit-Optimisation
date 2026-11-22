@@ -33,9 +33,6 @@
 
 ## 0.6.0 (2026-11-23)
 - Added mods/ (marketplace nextbrain-mods): handoff (500k), model-router, cache-clock, research-router, savings-proof; MODS.md maps each to its rule.
-- New rules A5 (subagent model tiers) and A6 (research stays out of main chat); S3/S4/S7 updated (hand off near 50
-## 0.6.0 (2026-11-23)
-- Added mods/ (marketplace nextbrain-mods): handoff (500k), model-router, cache-clock, research-router, savings-proof; MODS.md maps each to its rule.
 - New rules A5 (subagent model tiers) and A6 (research stays out of main chat); S3, S4, S7 updated (hand off near 50 percent, keep-warm guidance).
 - Checks skip vendored mods/plugins and the token-saving-mods reference folder (git-ignored).
 
@@ -45,3 +42,8 @@
 
 ## 0.6.2 (2026-11-23)
 - START-HERE route 4: how an agent updates a project that already has the system (check, update, read changelog, report).
+
+## 0.7.0 (2026-11-23)
+- install.sh --auto: one command decides update (with changelog since the project's version), install (new project) or dry run (project with its own rules).
+- skill/scripts/update.sh: a project pulls the source into ~/.claude/nextbrain-token-system and runs --auto; the 6th line of the always-on block triggers it on "token system updated". SOURCE file records the repo URL (credentials stripped).
+- START-HERE route 0: give any agent the GitHub URL and it does the rest.

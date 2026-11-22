@@ -3,3 +3,4 @@
 - No recaps or file dumps in replies. Guarded big files are queried, not opened (`rules/bigfiles.md`).
 - `/tips` (Claude) or `$tips` (Codex) lists every optimisation; open one child file per situation.
 - Flagged expensive session: offer `rules/session-review.md`.
+- Owner says the token system was updated: run `sh .agents/skills/token-optimisation/scripts/update.sh`, then follow its report.

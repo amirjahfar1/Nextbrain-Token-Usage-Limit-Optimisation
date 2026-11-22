@@ -10,7 +10,7 @@ Private, portable system that lowers token use and protects usage limits for Cla
 - Safe adoption path for existing projects (`ADOPTION.md`). Reading map: `MAP.md`. Commands: `/tips`, `/token-audit` (usage report, see `skill/guides/token-audit.md`), `/handoff`.
 
 ## Use it
-Tell the agent in any project: "Follow `<path to this repo>/START-HERE.md`." Or:
+Tell the agent in any project: "Follow `<path to this repo>/START-HERE.md`", or just give it the GitHub URL, or say "token system updated": it keeps one copy in `~/.claude/nextbrain-token-system` and runs `sh install.sh --auto <project>`. Manual:
 
 ```sh
 sh install.sh --dry-run /path/to/project
@@ -18,7 +18,7 @@ sh install.sh /path/to/project
 sh install.sh --check /path/to/project
 ```
 
-Also: `--update`, `--uninstall`, `--scan`. Needs `sh`, `python3` (stdlib only). Works offline after install.
+Also: `--auto` (decides update, install or dry run for you), `--update`, `--uninstall`, `--scan`. Needs `sh`, `python3` (stdlib only). Works offline after install.
 
 ## Maintain
 `sh scripts/check-repo.sh` (size limits, tips sync, links, secret patterns). Add a tip: one registry row plus a `## ID` heading in its rule file, then `sh skill/scripts/gen-tips.sh`.

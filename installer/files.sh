@@ -28,6 +28,8 @@ case "$op" in
     sync "$repo/skill" token-optimisation; sync "$repo/skill-tips" tips; sync "$repo/skill-audit" token-audit; sync "$repo/skill-handoff" handoff
     if [ -z "$dry" ]; then
       cp "$repo/VERSION" "$sk/token-optimisation/VERSION"
+      u=$(git -C "$repo" remote get-url origin 2>/dev/null | sed 's|//[^/@]*@|//|' || true)
+      printf '%s\n' "${u:-https://github.com/amirjahfar1/Nextbrain-Token-Usage-Limit-Optimisation.git}" > "$sk/token-optimisation/SOURCE"
       (cd "$sk" && for n in token-optimisation tips token-audit handoff; do [ -f "$n/.managed" ] && find "$n" -type f -not -name .manifest -not -name .managed | while read -r f; do echo "$(hash "$f")  $f"; done; done) > "$man"
       [ -f "$proj/.agents/token-optimisation.conf" ] || printf '# project overrides for token-optimisation (defaults: skill/config/defaults.conf)\nguard_mode=log\nranged=\n' > "$proj/.agents/token-optimisation.conf"
     fi

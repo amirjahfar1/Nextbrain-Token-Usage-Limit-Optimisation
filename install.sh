@@ -1,11 +1,12 @@
 #!/bin/sh
 # Install the token/usage optimisation system into a project.
-# Usage: sh install.sh [--dry-run|--check|--update|--uninstall|--scan] [--hooks=all|guard|none] [project-dir]
+# Usage: sh install.sh [--auto|--dry-run|--check|--update|--uninstall|--scan] [--hooks=all|guard|none] [project-dir]
+# --auto decides for the project: update, install (new project) or dry run (project with its own rules).
 set -eu
 R=$(cd "$(dirname "$0")" && pwd)
 mode=install; proj=.; hooks=all
 for a in "$@"; do case "$a" in
-  --hooks=*) hooks=${a#--hooks=} ;; --dry-run) mode=dry ;; --check) mode=check ;; --update) mode=update ;; --uninstall) mode=remove ;; --scan) mode=scan ;;
+  --hooks=*) hooks=${a#--hooks=} ;; --auto) mode=auto ;; --dry-run) mode=dry ;; --check) mode=check ;; --update) mode=update ;; --uninstall) mode=remove ;; --scan) mode=scan ;;
   -*) echo "unknown option $a" >&2; exit 2 ;; *) proj=$a ;; esac; done
 proj=$(cd "$proj" && pwd); SK=$proj/.agents/skills/token-optimisation
 [ "$proj" != "$R" ] || { echo "Run against a project, not the repo itself." >&2; exit 2; }
@@ -15,6 +16,7 @@ backup() {
   b=$proj/.claude/token-optimisation/backups/$(date +%Y%m%d-%H%M%S); mkdir -p "$b"
   for f in AGENTS.md CLAUDE.md; do [ -f "$proj/$f" ] && cp "$proj/$f" "$b/$f"; done; echo "backup: $b"; }
 case "$mode" in
+  auto) sh "$R/installer/auto.sh" "$R" "$proj" ;;
   scan) cd "$proj"; python3 "$R/skill/scripts/bigfile.py" scan ;;
   dry) echo "DRY RUN for $proj (nothing written)"; sh "$R/installer/files.sh" "$R" "$proj" install dry
        echo "  would add block to $(entry)"; python3 "$R/installer/settings_merge.py" "$proj" merge --dry-run | sed 's/^/  would: /' ;;

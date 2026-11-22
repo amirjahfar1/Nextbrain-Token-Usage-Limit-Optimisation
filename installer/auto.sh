@@ -1,0 +1,43 @@
+#!/bin/sh
+# auto.sh <repo> <project>: decide what this project needs and do the safe part. Prints a short report.
+#   installed, older  -> update, then show the CHANGELOG entries since its version, then check
+#   installed, current -> check only
+#   brand new project  -> install, then check
+#   has its own rules/settings -> dry run only; the owner approves a plan first (ADOPTION.md)
+set -eu
+R=$1; P=$2; SK=$P/.agents/skills/token-optimisation; new=$(cat "$R/VERSION")
+say() { echo "auto: $*"; }
+has_own() {
+  for f in AGENTS.md CLAUDE.md .claude/settings.json; do [ -s "$P/$f" ] && return 0; done
+  for d in .agents/skills .claude/skills; do [ -n "$(ls -A "$P/$d" 2>/dev/null)" ] && return 0; done
+  return 1
+}
+if [ -f "$SK/.manifest" ]; then
+  old=$(cat "$SK/VERSION" 2>/dev/null || echo unknown)
+  top=$(printf '%s\n%s\n' "$old" "$new" | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+  if [ "$old" = "$new" ]; then say "installed v$old, already current"
+  elif [ "$top" = "$old" ]; then say "project v$old is newer than the source v$new: not downgrading (did the pull fail? check the GitHub login)"
+  else
+    say "installed v$old, updating to v$new"
+    sh "$R/install.sh" --update "$P"
+    say "changes since v$old (CHANGELOG):"
+    awk -v o="$old" 'f { print } index($0, "## " o " ") { f = 1 }' "$R/CHANGELOG.md"
+  fi
+  sh "$R/install.sh" --check "$P" || say "CHECK FAILED: show the owner the lines above"
+elif has_own; then
+  say "this project has its own rules or settings: NOT installing yet. Dry run:"
+  sh "$R/install.sh" --dry-run "$P"
+  say "next: follow $R/ADOPTION.md (plan first, owner approves, then apply)"
+else
+  say "new project: installing v$new"
+  sh "$R/install.sh" "$P"
+  sh "$R/install.sh" --check "$P" || say "CHECK FAILED: show the owner the lines above"
+fi
+say "big or generated files in this project (scan):"
+(cd "$P" && python3 "$R/skill/scripts/bigfile.py" scan 2>&1 | head -12) || true
+if grep -qs "nextbrain-mods" "$HOME/.claude/plugins/installed_plugins.json" "$HOME/.claude/settings.json"; then
+  say "claude code mods: nextbrain-mods found"
+else
+  say "claude code mods: not detected on this Mac (Claude Code only, install once: $R/MODS.md; ignore for Codex)"
+fi
+say "done. Next: summarise the changes in 3 lines, then check the project's own AGENTS.md/CLAUDE.md for rules that clash with the new ones and propose edits (never change owner rules without a yes)."
