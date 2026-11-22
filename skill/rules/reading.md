@@ -1,7 +1,7 @@
 # Reading discipline
 
 ## R1 Locate before you read
-Find the owner first: the area in `.claude/token-optimisation/ROUTES.md` (generated routing map, if present), then a CODEMAP row, one bounded code-graph query, or `grep -n` inside that area. Never `find`/`grep -r` the whole tree or read files "to get a feel".
+Find the owner first: the file or area in `.claude/token-optimisation/ROUTES.md` (generated map of instructions, docs and their shards, and code areas; if present), then a CODEMAP row, one bounded code-graph query, or `grep -n` inside that area. Never `find`/`grep -r` the whole tree or read files "to get a feel".
 
 ## R2 Read what the task needs, in ranges
 Use `Read` with offset/limit around the symbol. Read the few files the task really needs; for a large change list the affected files first, then read what each change needs. If you keep opening unrelated files, re-locate.

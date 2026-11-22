@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Routing map: area -> kind -> entry file -> what it is. Writes <project>/.claude/token-optimisation/ROUTES.md.
-Usage: gen_routes.py [--force] [project_dir]. Rewrites only when the file list changed. It is the coarse layer
-above CODEMAP / code graph (symbols): find the area here first, then ask the symbol tool or grep -n inside it."""
-import hashlib, os, subprocess, sys
+"""Routing map for a project, written to <project>/.claude/token-optimisation/ROUTES.md (+ ROUTES/ children when long):
+  instructions (AGENTS.md, CLAUDE.md, skills, commands, rules ...), docs, each with its shards if a big file was split,
+  then code areas. Usage: gen_routes.py [--force] [project_dir]. Rewrites only when the file list or a doc size changed.
+It is the coarse layer above CODEMAP / code graph: find the file or area here, then go inside with a symbol tool or grep -n."""
+import hashlib, os, shutil, subprocess, sys
 from collections import Counter
 
-SKIP = {"node_modules", ".git", "dist", "build", ".next", ".venv", "venv", "__pycache__", ".claude", ".agents",
-        ".index", "coverage", "target", "vendor", ".idea", ".vscode"}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import routes_docs as rd
+
+SKIP = {"node_modules", ".git", "dist", "build", ".next", ".venv", "venv", "__pycache__", ".index", "coverage",
+        "target", "vendor", ".idea", ".vscode"}
 BINARY = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".ico", ".woff", ".woff2", ".ttf", ".eot", ".pdf",
           ".zip", ".mp4", ".mp3", ".lock", ".map", ".min.js", ".DS_Store")
-ENTRY = ("README.md", "readme.md", "SKILL.md", "AGENTS.md", "CLAUDE.md", "index.ts", "index.tsx", "index.js",
-         "index.py", "main.py", "main.ts", "main.go", "main.rs", "app.py", "__init__.py", "mod.rs", "lib.rs")
-ROOT_KEEP = ("README.md", "AGENTS.md", "CLAUDE.md", "package.json", "pyproject.toml", "Cargo.toml", "go.mod",
-             "Makefile", "docker-compose.yml", "Dockerfile", "requirements.txt", "install.sh", "VERSION")
+ENTRY = ("README.md", "readme.md", "index.ts", "index.tsx", "index.js", "index.py", "main.py", "main.ts", "main.go",
+         "main.rs", "app.py", "__init__.py", "mod.rs", "lib.rs")
+ROOT_KEEP = ("package.json", "pyproject.toml", "Cargo.toml", "go.mod", "Makefile", "docker-compose.yml", "Dockerfile",
+             "requirements.txt", "install.sh", "VERSION")
 SPLIT_AT, MAXROWS = 25, 40
 
 
@@ -26,8 +30,9 @@ def listing(root):
         for r, ds, names in os.walk(root):
             ds[:] = [d for d in ds if d not in SKIP]
             fs += [os.path.relpath(os.path.join(r, n), root) for n in names]
+    # .claude / .agents hold instructions, skills, commands: only their docs are listed, never settings or state
     return sorted(f for f in fs if not set(f.split("/")) & SKIP and not f.endswith(BINARY)
-                  and os.path.isfile(os.path.join(root, f)))
+                  and (f.split("/")[0] not in (".claude", ".agents") or rd.is_doc(f)) and os.path.isfile(os.path.join(root, f)))
 
 
 def split(prefix, fs, depth):
@@ -44,41 +49,32 @@ def split(prefix, fs, depth):
     return rows
 
 
-def hint(root, path):
-    try:
-        for line in open(os.path.join(root, path), errors="replace"):
-            t = line.strip().lstrip("#").strip()
-            if t.startswith("description:"):
-                t = t[12:].strip().strip('"')
-            if t and not t.startswith(("---", "<!--", "name:")):
-                return t[:60].replace("|", "/")
-    except OSError:
-        pass
-    return ""
-
-
 def row(root, path, fs):
     base = path.rstrip("*")
     kinds = Counter(os.path.splitext(f)[1] or "(none)" for f in fs).most_common(2)
     entry = next((e for e in ENTRY if base + e in fs), "")
-    h = hint(root, base + entry) if entry.endswith(".md") else ""
+    h = rd.info(root, base + entry)["title"] if entry.endswith(".md") else ""
     return "| `%s` | %d | %s | %s | %s |" % (path, len(fs), " ".join(k for k, _ in kinds), ("`%s`" % entry) if entry else "-", h or "-")
 
 
-def build(root, fs, sig):
-    rows = split("", fs, 0)
+def build(root, fs, ins, docs, sig):
+    out = {}
+    code = [f for f in fs if f.split("/")[0] not in (".claude", ".agents")]
+    rows = split("", code, 0)
     shown = sorted(sorted(rows, key=lambda r: -len(r[1]))[:MAXROWS])
-    top = [f for f in fs if "/" not in f]
+    top = [f for f in code if "/" not in f]
     keep = [f for f in top if f in ROOT_KEEP]
-    out = ["# Routing map (generated; do not edit)", "<!-- sig:%s -->" % sig,
-           "Find the area here, then use CODEMAP / code graph / `grep -n` inside it. Open one file, not the folder.", "",
-           "| Area | Files | Kinds | Entry | What it is |", "|---|---|---|---|---|"]
-    out += [row(root, p, l) for p, l in shown]
+    p = ["# Routing map (generated; do not edit)", "<!-- sig:%s -->" % sig,
+         "Pick the file or area here, open only that one (a [split] file: only the shard you need), then CODEMAP / code graph / `grep -n` inside it.", ""]
+    p += rd.section("instructions", "Instructions", ins, out) + [""] * bool(ins)
+    p += rd.section("docs", "Docs", docs, out) + [""] * bool(docs)
+    p += ["## Code and other areas", "| Area | Files | Kinds | Entry | What it is |", "|---|---|---|---|---|"]
+    p += [row(root, a, l) for a, l in shown]
     if len(rows) > len(shown):
-        out.append("| (%d smaller areas not listed) | | | | `ls` the parent folder |" % (len(rows) - len(shown)))
-    out += ["", "Root files: " + (", ".join("`%s`" % f for f in keep) or "none") + (
-        "; %d others" % (len(top) - len(keep)) if len(top) > len(keep) else "")]
-    return "\n".join(out) + "\n"
+        p.append("| (%d smaller areas not listed) | | | | `ls` the parent folder |" % (len(rows) - len(shown)))
+    p += ["", "Root files: " + (", ".join("`%s`" % f for f in keep) or "none") + ("; %d others" % (len(top) - len(keep)) if len(top) > len(keep) else "")]
+    out["ROUTES.md"] = "\n".join(p) + "\n"
+    return out
 
 
 def refresh(root, force=False):
@@ -86,19 +82,23 @@ def refresh(root, force=False):
     fs = listing(root)
     if not fs:
         return "empty"
-    sig = hashlib.sha256("\n".join(fs).encode("utf-8", "surrogateescape")).hexdigest()[:16]
-    p = os.path.join(root, ".claude", "token-optimisation", "ROUTES.md")
+    ins, docs = rd.collect(root, fs)
+    h = hashlib.sha256("\n".join(fs + ["%s:%d" % (i["f"], i["b"]) for i in ins + docs]).encode("utf-8", "surrogateescape")).hexdigest()[:16]
+    d = os.path.join(root, ".claude", "token-optimisation")
     old = None
     try:
-        old = open(p).read(400)
+        old = open(os.path.join(d, "ROUTES.md")).read(600)
     except OSError:
         pass
-    if old and ("sig:%s" % sig) in old and not force:
+    if old and ("sig:%s" % h) in old and not force:
         return "same"
-    os.makedirs(os.path.dirname(p), exist_ok=True)
-    tmp = p + ".tmp"
-    open(tmp, "w").write(build(root, fs, sig))
-    os.replace(tmp, p)
+    out = build(root, fs, ins, docs, h)
+    shutil.rmtree(os.path.join(d, "ROUTES"), ignore_errors=True)  # children of an older map
+    for rel, text in sorted(out.items(), reverse=True):  # children first, ROUTES.md (with the sig) last
+        t = os.path.join(d, rel)
+        os.makedirs(os.path.dirname(t), exist_ok=True)
+        open(t + ".tmp", "w").write(text)
+        os.replace(t + ".tmp", t)
     return "updated" if old else "created"
 
 

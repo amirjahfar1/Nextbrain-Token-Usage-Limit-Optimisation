@@ -281,6 +281,11 @@ t_E06() { fresh e06 LITE=1; inst "$P" >/dev/null; m="$P/.claude/token-optimisati
   printf '%s' "$o" | grep -q 'routing map' && ok "one line announces it" || no "agent is not told the map exists"
   o=$(printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py); [ -z "$o" ] && ok "unchanged files: silent, no rewrite" || no "same line injected into every session: $o"
   mkdir -p "$P/newarea"; echo x > "$P/newarea/a.py"; printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null; grep -q 'newarea/' "$m" && ok "new folder appears in the map" || no "map not refreshed after a new folder"
+  mkdir -p "$P/docs"; printf '# Big manual\n\n' > "$P/docs/big.md"; n=1; while [ $n -le 8 ]; do { printf '## Part %s\n' $n; yes line | head -n 30; } >> "$P/docs/big.md"; n=$((n + 1)); done
+  ( cd "$P" && python3 "$R/skill/scripts/bigfile.py" split-md docs/big.md --apply >/dev/null ); printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null
+  grep -q 'docs/big.md.*split' "$m" && grep -q 'docs/big/01-' "$m" && ! grep -q '^- `docs/big/01-' "$m" && ok "split doc listed once with its shard and sections" || no "split doc/shards not mapped correctly"
+  mkdir -p "$P/.claude/skills/mine"; printf -- '---\nname: mine\ndescription: "My own skill"\n---\n' > "$P/.claude/skills/mine/SKILL.md"; printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null
+  grep -q 'skills/mine/SKILL.md.*My own skill' "$m" && ! grep -q 'skills/token-optimisation' "$m" && ok "owner skills mapped, this system's own skills not" || no "skills section wrong"
   mkdir -p "$P/sub"; printf '{"cwd":"%s/sub"}' "$P" | hook "$P" session_start.py >/dev/null; [ -e "$P/sub/.claude" ] && no "map written under the session subfolder instead of the project root" || ok "subfolder session uses the project root"
   rm -f "$m"; printf 'routes=0\n' > "$P/.agents/token-optimisation.conf"; printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null; [ -e "$m" ] && no "routes=0 ignored" || ok "routes=0 turns it off"; }
 run A01 "dry-run writes nothing, output small, discloses all writes"

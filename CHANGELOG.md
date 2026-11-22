@@ -71,5 +71,5 @@
 ## 0.12.1 (2026-11-23)
 - Docs: README rewritten; new COMMANDS.md lists every command, flag and script.
 
-## 0.13.0 (2026-11-23)
-- Routing map: gen_routes.py writes `.claude/token-optimisation/ROUTES.md` per project, refreshed at session start; read before CODEMAP/grep. `routes=0` disables.
+## 0.14.0 (2026-11-23)
+- Routing map lists every instruction and doc file (any folder, skills, commands) with its shards when a big file was split; long lists go to `ROUTES/` children.
