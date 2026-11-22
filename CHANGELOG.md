@@ -70,3 +70,6 @@
 
 ## 0.12.1 (2026-11-23)
 - Docs: README rewritten; new COMMANDS.md lists every command, flag and script.
+
+## 0.13.0 (2026-11-23)
+- Routing map: gen_routes.py writes `.claude/token-optimisation/ROUTES.md` per project, refreshed at session start; read before CODEMAP/grep. `routes=0` disables.

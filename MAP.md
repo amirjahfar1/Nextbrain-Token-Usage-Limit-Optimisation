@@ -9,7 +9,7 @@ Rule: open the parent only, then ONE child. Never a whole folder.
 | Parent | `START-HERE.md` | this repo is handed to a project |
 | Parent | `ADOPTION.md` | project already has its own rules/hooks/settings |
 | Child | `adoption/01-inventory.md`, `02-plan.md`, `03-apply-verify-rollback.md` | adoption phase 1-2 / 3 / 4 |
-| Child | `rules/reading.md` | before reading code or running commands |
+| Child | `rules/reading.md` | before reading code or running commands (a project's `.claude/token-optimisation/ROUTES.md` is the first stop) |
 | Child | `rules/requests.md`, `output.md` | receiving a request / writing a reply |
 | Child | `rules/bigfiles.md` | a lockfile, generated or oversized file |
 | Child | `rules/mcp.md` | connector or plugin overhead |

@@ -4,7 +4,7 @@ K2	core	One owner per rule: merge instead of duplicating, resolve conflicts in p
 K3	core	No big files: split into parent index plus small children in the same change.	file over limit	rules/core.md#K3	script
 K4	core	Never invent token counts or percentages; label thresholds as heuristics.	reporting usage	rules/core.md#K4	rule
 K5	core	Optimise safely: verify, back up, ask before removing existing rules or hooks.	any optimisation	rules/core.md#K5	rule
-R1	reading	Locate first (CODEMAP, code graph, grep -n); never scan the whole tree.	before reading	rules/reading.md#R1	rule
+R1	reading	Locate first (ROUTES.md area, then CODEMAP, code graph, grep -n); never scan the whole tree.	before reading	rules/reading.md#R1	rule
 R2	reading	Read ranges with offset/limit; only the files the task needs, else re-locate.	reading code	rules/reading.md#R2	hook
 R3	reading	Cap command output with head/tail; send long logs to a file and grep.	running commands	rules/reading.md#R3	rule
 R4	reading	Do not re-read an unchanged file; do after a compaction or when a tool changed it.	before reading	rules/reading.md#R4	rule

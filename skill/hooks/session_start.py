@@ -2,11 +2,26 @@
 """SessionStart: one plain stdout line (reaches the agent) when a review is pending or a resume is stale."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _common import guarded, load_input, project_dir, state_dir
+from _common import SKILL, conf, guarded, load_input, project_dir, state_dir
+
+
+def routes(root):
+    """Keep the project's routing map fresh (rewritten only when the file list changed); say so once per change."""
+    if conf(root).get("routes", "1") == "0":
+        return
+    sys.path.insert(0, os.path.join(SKILL, "scripts"))
+    from gen_routes import refresh
+    if refresh(root) in ("created", "updated"):
+        print("token-optimisation: routing map refreshed: .claude/token-optimisation/ROUTES.md. To find where "
+              "something lives, open it first, then CODEMAP / code graph / grep -n inside that area.")
 
 
 def run():
     d = load_input()
+    try:
+        routes(project_dir(d))
+    except Exception:
+        pass
     sd = state_dir(project_dir(d))
     pr = os.path.join(sd, "pending-review")
     if os.path.exists(pr):

@@ -1,7 +1,7 @@
-- Token rules (`.agents/skills/token-optimisation/`): locate first, read ranges, read what the task needs; do not re-read an unchanged file (do after a compaction or when a tool changed it); cap command output.
-- Never use or switch to the strongest model (Fable) on your own: ask the owner first (`rules/models.md` L6).
+- Token rules (`.agents/skills/token-optimisation/`): locate first (`.claude/token-optimisation/ROUTES.md` area, then CODEMAP/code graph/`grep -n`), read ranges, only what the task needs; no re-read of unchanged files (except after compaction or a tool change); cap command output.
+- Never use or switch to the strongest model (Fable) unasked: ask the owner first (`rules/models.md` L6).
 - Tiny clear request: say it back in one line and do it. Bigger: short plan, 1-3 questions with defaults, wait for yes.
 - No recaps or file dumps in replies. Guarded big files are queried, not opened (`rules/bigfiles.md`).
-- `/tips` (Claude) or `$tips` (Codex) lists every optimisation; open one child file per situation.
+- `/tips` (Claude) or `$tips` (Codex) lists every optimisation.
 - Flagged expensive session: offer `rules/session-review.md`.
 - Owner says the token system was updated: run `sh .agents/skills/token-optimisation/scripts/update.sh`, then follow its report.

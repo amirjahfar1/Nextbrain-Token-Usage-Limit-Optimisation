@@ -7,7 +7,7 @@ A portable system that lowers token use and protects usage limits for Claude Cod
 |---|---|---|
 | Rules | `skill/rules/` | Small on-demand rule files (reading, requests, models, sessions, subagents, MCP, big files). Only a 5-line block is always loaded |
 | Tips | `skill/tips/registry.tsv` | One registry; `/tips` prints every optimisation, generated from it |
-| Guards and tools | `skill/hooks/`, `skill/scripts/` | Big-file guard, big-file index and shard tools, expensive-session review, cost reports |
+| Guards and tools | `skill/hooks/`, `skill/scripts/` | Big-file guard, big-file index and shard tools, expensive-session review, cost reports, generated project routing map (`ROUTES.md`: area, entry file, what it is; refreshed at session start, used before CODEMAP/code graph) |
 | Claude Code mods | `mods/` | Ten mods installed once per Mac, for every project: handoff, model-router, cache-clock, research-router, savings-proof, token-meter, input-router, effort-optimizer, efficient-browser-use, mods. See `MODS.md` |
 | Installer | `install.sh`, `installer/` | Safe install, update and uninstall; refuses before writing, never overwrites a project's own rules |
 | Adoption | `ADOPTION.md`, `adoption/` | Safe path for a project that already has its own rules |

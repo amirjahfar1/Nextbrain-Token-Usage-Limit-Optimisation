@@ -46,6 +46,7 @@ input-router, effort-optimizer and efficient-browser-use have no command: they r
 | `sh scripts/check-size.sh`, `sh skill/scripts/check-size.sh` | Fail on a file over its size limit |
 | `sh skill/scripts/tips.sh` | Prints tips by area: `--all`, area letter or id |
 | `sh skill/scripts/gen-tips.sh` | Rebuilds the tips block from the registry; `--check` only checks |
+| `python3 skill/scripts/gen_routes.py [project] [--force]` | Builds the project's routing map `.claude/token-optimisation/ROUTES.md` (also runs by itself at session start when the file list changed; `routes=0` in the conf turns it off) |
 | `sh skill/scripts/audit.sh` | Short read-only token audit of a project |
 | `sh skill/scripts/update.sh [project]` | Updates a project from its source repo |
 | `python3 skill/scripts/bigfile.py scan\|index\|get\|split-md` | Index and shard big files so they are never read whole |

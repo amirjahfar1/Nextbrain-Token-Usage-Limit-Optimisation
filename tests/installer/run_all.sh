@@ -276,6 +276,13 @@ t_H02() { fresh h02 LITE=1 ENTRY=none SETTINGS=none; inst "$P" >/dev/null
   for n in token-optimisation tips token-audit handoff; do python3 -c 'import re,sys; t=open(sys.argv[1]).read(); d=re.search(r"^description: (.*)$",t,re.M).group(1); sys.exit(0 if d.startswith(chr(34)) or ": " not in d else 1)' "$P/.agents/skills/$n/SKILL.md" && ok "skill $n frontmatter is valid YAML" || no "skill '$n' frontmatter: unquoted description contains ': ' (invalid YAML for strict parsers)"; done
   grep -rq '\.\./token-optimisation' "$P/.agents/skills"/*/SKILL.md && no "a SKILL.md uses ../token-optimisation paths that do not exist from the project root" || ok "skill paths resolve from the project root"; }
 
+t_E06() { fresh e06 LITE=1; inst "$P" >/dev/null; m="$P/.claude/token-optimisation/ROUTES.md"
+  o=$(printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py); [ -s "$m" ] && ok "routing map created at session start" || no "ROUTES.md not created"
+  printf '%s' "$o" | grep -q 'routing map' && ok "one line announces it" || no "agent is not told the map exists"
+  o=$(printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py); [ -z "$o" ] && ok "unchanged files: silent, no rewrite" || no "same line injected into every session: $o"
+  mkdir -p "$P/newarea"; echo x > "$P/newarea/a.py"; printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null; grep -q 'newarea/' "$m" && ok "new folder appears in the map" || no "map not refreshed after a new folder"
+  mkdir -p "$P/sub"; printf '{"cwd":"%s/sub"}' "$P" | hook "$P" session_start.py >/dev/null; [ -e "$P/sub/.claude" ] && no "map written under the session subfolder instead of the project root" || ok "subfolder session uses the project root"
+  rm -f "$m"; printf 'routes=0\n' > "$P/.agents/token-optimisation.conf"; printf '{"cwd":"%s"}' "$P" | hook "$P" session_start.py >/dev/null; [ -e "$m" ] && no "routes=0 ignored" || ok "routes=0 turns it off"; }
 run A01 "dry-run writes nothing, output small, discloses all writes"
 run A02 "install into big project: only documented paths, settings merged additively"
 run A03 "idempotent: install + 2x update gives identical files, no duplicates"
@@ -311,6 +318,7 @@ run E02 "deny mode cannot deadlock edits of small files under dist/"
 run E03 "guard honours project conf when session cwd is a subfolder"
 run E04 "missing hook script fails open (not exit 2)"
 run E05 "session_start / session_end robust; pending review cleared"
+run E06 "routing map: created, refreshed on change, silent otherwise, routes=0 off"
 run F01 "auto: own rules -> dry run; new -> install; rerun -> check"
 run F02 "auto has_own() recognises other rule/config locations"
 run F03 "no downgrade via --auto or --update"
