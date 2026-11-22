@@ -42,3 +42,6 @@
 ## 0.6.1 (2026-11-23)
 - Fable gate (L6): the planner model runs only when the owner names it; deep work uses role_deep (Opus-class) at normal effort with a bounded brief and report. ADOPTION, START-HERE and adoption/02-plan no longer say "strongest model" by default.
 - model-router leaves a Fable model named on the Agent call alone; never picks Fable.
+
+## 0.6.2 (2026-11-23)
+- START-HERE route 4: how an agent updates a project that already has the system (check, update, read changelog, report).
