@@ -1,13 +1,15 @@
 #!/bin/sh
 # Install the token/usage optimisation system into a project.
 # Usage: sh install.sh [--auto|--dry-run|--check|--update|--uninstall|--scan] [--hooks=all|guard|none] [project-dir]
-# --auto decides for the project: update, install (new project) or dry run (project with its own rules).
+# --auto decides for the project: update, install (new project) or dry run (project with its own rules), then installs or updates the Claude Code mods (skip with --no-mods).
+# --mods installs or updates only the Claude Code mods (once per Mac, no project needed).
 set -eu
 R=$(cd "$(dirname "$0")" && pwd)
 mode=install; proj=.; hooks=all
 for a in "$@"; do case "$a" in
-  --hooks=*) hooks=${a#--hooks=} ;; --auto) mode=auto ;; --dry-run) mode=dry ;; --check) mode=check ;; --update) mode=update ;; --uninstall) mode=remove ;; --scan) mode=scan ;;
+  --hooks=*) hooks=${a#--hooks=} ;; --auto) mode=auto ;; --mods) mode=mods ;; --no-mods) NEXTBRAIN_NO_MODS=1; export NEXTBRAIN_NO_MODS ;; --dry-run) mode=dry ;; --check) mode=check ;; --update) mode=update ;; --uninstall) mode=remove ;; --scan) mode=scan ;;
   -*) echo "unknown option $a" >&2; exit 2 ;; *) proj=$a ;; esac; done
+[ "$mode" != mods ] || exec sh "$R/installer/mods.sh" "$R"
 proj=$(cd "$proj" && pwd); SK=$proj/.agents/skills/token-optimisation
 [ "$proj" != "$R" ] || { echo "Run against a project, not the repo itself." >&2; exit 2; }
 entry() {

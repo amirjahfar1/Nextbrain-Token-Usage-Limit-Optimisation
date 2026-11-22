@@ -47,3 +47,14 @@
 - install.sh --auto: one command decides update (with changelog since the project's version), install (new project) or dry run (project with its own rules).
 - skill/scripts/update.sh: a project pulls the source into ~/.claude/nextbrain-token-system and runs --auto; the 6th line of the always-on block triggers it on "token system updated". SOURCE file records the repo URL (credentials stripped).
 - START-HERE route 0: give any agent the GitHub URL and it does the rest.
+
+## 0.8.0 (2026-11-23)
+- New mod token-meter (nextbrain-mods): Token Meter pane (context, five hour and seven day limits, cost, top tools, savings today) and a Full report button; /token-report shows sessions, input, output, cache hit, measured savings (tokens and %), by day, model, project and tool for today, 7d, 30d or all time; report.py also writes a markdown report file.
+
+## 0.9.0 (2026-11-23)
+- installer/mods.sh: installs or updates every mod in mods/ with the Claude Code CLI (idempotent; list read from marketplace.json). install.sh --auto runs it; --mods does only that; --no-mods skips.
+- check-repo.sh fails when a mod is missing from MODS.md or its version differs from marketplace.json. CLAUDE.md: instructions must be updated in the same change as any mod or flow.
+
+## 0.10.0 (2026-11-23)
+- mods.sh checks each mod's installed version (install record) against the repo's: install when missing, update when older, leave when current; prints one line per mod.
+- token-meter 0.2.0: "Is the system paying off?" before/after analysis per request (cost, fresh input, tool output, peak context, cache hit, compactions) with an indicative saving in dollars and tokens, mods-era comparison and guard counts; needs 20 requests per side; shown in the report pane, the markdown file and the Today card.

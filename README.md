@@ -18,7 +18,7 @@ sh install.sh /path/to/project
 sh install.sh --check /path/to/project
 ```
 
-Also: `--auto` (decides update, install or dry run for you), `--update`, `--uninstall`, `--scan`. Needs `sh`, `python3` (stdlib only). Works offline after install.
+Also: `--auto` (decides update, install or dry run for you, then installs the Claude Code mods), `--mods` (only the mods), `--no-mods`, `--update`, `--uninstall`, `--scan`. Needs `sh`, `python3` (stdlib only). Works offline after install.
 
 ## Maintain
 `sh scripts/check-repo.sh` (size limits, tips sync, links, secret patterns). Add a tip: one registry row plus a `## ID` heading in its rule file, then `sh skill/scripts/gen-tips.sh`.

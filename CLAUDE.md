@@ -16,6 +16,8 @@ Goal: only upgrade and optimise this token-usage optimisation system for Claude 
 - Never weaken or delete an existing rule/hook without the owner's yes.
 - Before finishing any change: `sh scripts/check-repo.sh` must pass.
 - Each change: bump `VERSION`, add a `CHANGELOG.md` entry (one line, same style).
+- Instructions travel with the change. When a mod, command, script or flow is added or changed, update in the SAME change: `MODS.md` (what it is, how it installs), `START-HERE.md` and `README.md` if the owner-facing steps change, and the automatic flow (`installer/auto.sh`, `installer/mods.sh`). Goal: on any other PC, an agent given this repo does everything with no manual step. A new mod goes in `mods/.claude-plugin/marketplace.json` (its version equal to its `plugin.json`) and in `MODS.md`; `scripts/check-repo.sh` fails if not.
+- Test the install path with a scratch `CLAUDE_CONFIG_DIR`, never the owner's real config.
 
 ## "Update kar do" workflow (GitHub, via global GitHub MCP)
 When the owner says "update kar do" (or similar):

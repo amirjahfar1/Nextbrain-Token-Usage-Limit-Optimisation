@@ -35,9 +35,5 @@ else
 fi
 say "big or generated files in this project (scan):"
 (cd "$P" && python3 "$R/skill/scripts/bigfile.py" scan 2>&1 | head -12) || true
-if grep -qs "nextbrain-mods" "$HOME/.claude/plugins/installed_plugins.json" "$HOME/.claude/settings.json"; then
-  say "claude code mods: nextbrain-mods found"
-else
-  say "claude code mods: not detected on this Mac (Claude Code only, install once: $R/MODS.md; ignore for Codex)"
-fi
+if [ -n "${NEXTBRAIN_NO_MODS:-}" ]; then say "mods: skipped (--no-mods)"; else sh "$R/installer/mods.sh" "$R"; fi
 say "done. Next: summarise the changes in 3 lines, then check the project's own AGENTS.md/CLAUDE.md for rules that clash with the new ones and propose edits (never change owner rules without a yes)."
