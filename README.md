@@ -1,16 +1,21 @@
 # Nextbrain Token | Usage Limit Optimisation
 
-Private, portable system that lowers token use and protects usage limits for Claude Code and Codex.
+A portable system that lowers token use and protects usage limits for Claude Code and Codex. Hand an agent this repo (or its GitHub URL) and it installs everything itself.
 
-- Small always-loaded block (5 lines) plus on-demand rule files; no file is big.
-- Guards for big and generated files, index and shard tools for managing them.
-- Expensive-session review: every session is recorded; a flagged one prompts a cost report and suggested fixes, applied only with owner approval.
-- `/tips` or `$tips` prints every optimisation, generated from one registry.
-- Optional Claude Code mods, installed once for all projects: `MODS.md`.
-- Safe adoption path for existing projects (`ADOPTION.md`). Reading map: `MAP.md`. Commands: `/tips`, `/token-audit` (usage report, see `skill/guides/token-audit.md`), `/handoff`.
+## What is inside
+| Part | Where | What it does |
+|---|---|---|
+| Rules | `skill/rules/` | Small on-demand rule files (reading, requests, models, sessions, subagents, MCP, big files). Only a 5-line block is always loaded |
+| Tips | `skill/tips/registry.tsv` | One registry; `/tips` prints every optimisation, generated from it |
+| Guards and tools | `skill/hooks/`, `skill/scripts/` | Big-file guard, big-file index and shard tools, expensive-session review, cost reports |
+| Claude Code mods | `mods/` | Ten mods installed once per Mac, for every project: handoff, model-router, cache-clock, research-router, savings-proof, token-meter, input-router, effort-optimizer, efficient-browser-use, mods. See `MODS.md` |
+| Installer | `install.sh`, `installer/` | Safe install, update and uninstall; refuses before writing, never overwrites a project's own rules |
+| Adoption | `ADOPTION.md`, `adoption/` | Safe path for a project that already has its own rules |
+
+Rules work in any client (Claude Code, Codex, others). Mods are Claude Code only and add automation on top.
 
 ## Use it
-Tell the agent in any project: "Follow `<path to this repo>/START-HERE.md`", or just give it the GitHub URL, or say "token system updated": it keeps one copy in `~/.claude/nextbrain-token-system` and runs `sh install.sh --auto <project>`. Manual:
+Tell the agent in any project: "Follow `<path to this repo>/START-HERE.md`", or give it the GitHub URL, or say "token system updated". It keeps one copy in `~/.claude/nextbrain-token-system` and runs `sh install.sh --auto <project>`. Manual:
 
 ```sh
 sh install.sh --dry-run /path/to/project
@@ -18,9 +23,24 @@ sh install.sh /path/to/project
 sh install.sh --check /path/to/project
 ```
 
-Also: `--auto` (decides update, install or dry run for you, then installs the Claude Code mods), `--mods` (only the mods), `--no-mods`, `--update`, `--uninstall`, `--scan`. Needs `sh`, `python3` (stdlib only). Works offline after install.
+Needs `sh` and `python3` (stdlib only). Works offline after install.
+
+## Commands
+Slash commands in a chat:
+
+| Command | Does |
+|---|---|
+| `/tips`, `$tips` | All token tips, or help choosing model and context |
+| `/token-audit` | Usage and cost audit of the project |
+| `/handoff`, `/fresh` | Checkpoint this chat, or move the work to a fresh chat |
+| `/savings`, `/token-meter`, `/token-report` | What the mods saved; live meter; full report |
+| `/mods` | List mods, turn each on or off (`/mods off <name>`) |
+| `/model-router`, `/research-router` | Subagent model picks; cheap web research brief |
+| `/cacheclock`, `/keepwarm` | Prompt-cache countdown; optional keep-warm ping |
+
+Installer flags, maintenance scripts and every command in two lines each: `COMMANDS.md`.
 
 ## Maintain
-`sh scripts/check-repo.sh` (size limits, tips sync, links, secret patterns). Add a tip: one registry row plus a `## ID` heading in its rule file, then `sh skill/scripts/gen-tips.sh`.
+`sh scripts/check-repo.sh` (size limits, tips sync, links, secret patterns) must pass before any change. Add a tip: one registry row plus a `## ID` heading in its rule file, then `sh skill/scripts/gen-tips.sh`. Reading order for contributors: `MAP.md`, `CLAUDE.md`.
 
-Private repo: contains no secrets or personal data. Model names are owner-configurable in `skill/config/defaults.conf`.
+Keep the repo private: it holds no secrets or personal data. Model names are owner-configurable in `skill/config/defaults.conf`.

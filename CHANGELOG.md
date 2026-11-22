@@ -60,10 +60,13 @@
 - token-meter 0.2.0: "Is the system paying off?" before/after analysis per request (cost, fresh input, tool output, peak context, cache hit, compactions) with an indicative saving in dollars and tokens, mods-era comparison and guard counts; needs 20 requests per side; shown in the report pane, the markdown file and the Today card.
 
 ## 0.11.0 (2026-11-23)
-- Installer rewritten after an adversarial audit (44 scenarios, tests/installer/run_all.sh): refuses before writing (bad settings, no python3, bad --hooks, project inside a git repo's subfolder, home folder, unmanaged token-optimisation skill); markers match whole lines and unbalanced ones abort; the block is replaced in place, CRLF and final newline kept; settings keep their formatting and the original file is restored byte for byte; uninstall removes only what installed.json recorded (single hook items, our deny rules, our links, conf, .gitignore lines, created files); local edits survive every update; no downgrade in install.sh; hooks fail open and use CLAUDE_PROJECT_DIR; entry file is CLAUDE.md when Claude Code needs it.
-- --auto never installs into a project with its own rules (wider detection: .claude/settings.local.json, commands, agents, .mcp.json, CLAUDE.local.md, nested rule files, other agents' rule files) and then touches no mods.
+- Installer rewritten after an adversarial audit (44 scenarios, tests/installer/run_all.sh): refuses before writing on bad settings, missing python3, bad --hooks, subfolder or home folder, unmanaged skill; markers match whole lines; the block is replaced in place and the original settings restored byte for byte; uninstall removes only what installed.json recorded; local edits survive every update; no downgrade; hooks fail open; entry file is CLAUDE.md when Claude Code needs it.
+- --auto never installs into a project with its own rules (wider detection of the project's own settings, commands, agents and rule files) and then touches no mods.
 - New step 0 for every route: ask the owner "Fable or the current model?" (adoption/00-owner-questions.md, L6); inventory cheaply; git-branch rollback; definition of done; rules R2, R4, K1-K3, K6, B6 stop pushing quality loss onto owner files.
 - Mods: mods.sh leaves disabled mods alone and re-points the marketplace safely; update.sh trusts only the owner's repo and shows new commits; model-router 0.6.1 respects named models and ranks Fable above deep; token-meter 0.3.0 counts subagent transcripts (reports were undercounting), uses INSTALLED_AT, quick mode, and fixes crashes.
 
 ## 0.12.0 (2026-11-23)
 - Mods: four new (input-router, effort-optimizer, efficient-browser-use, /mods switchboard), all no-model-call; marketplace and MODS.md updated, install stays automatic.
+
+## 0.12.1 (2026-11-23)
+- Docs: README rewritten; new COMMANDS.md lists every command, flag and script.
