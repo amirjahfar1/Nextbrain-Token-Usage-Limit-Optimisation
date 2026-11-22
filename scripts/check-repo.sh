@@ -1,12 +1,13 @@
 #!/bin/sh
 # Repo self-check: size limits, tips sync, relative links, secret patterns, hook smoke test.
 R=$(cd "$(dirname "$0")/.." && pwd); bad=0
+TL=$(mktemp "${TMPDIR:-/tmp}/tokopt-links.XXXXXX") || { echo "cannot create a temp file" >&2; exit 1; }
 sh "$R/skill/scripts/check-size.sh" "$R" || bad=1
 sh "$R/skill/scripts/gen-tips.sh" --check || bad=1
 find "$R" -name '*.md' -not -path '*/.git/*' -not -path '*/token-saving-mods/*' | while read -r f; do
   grep -o '](\([^)#h][^)#]*\)' "$f" | sed 's/](//' | while read -r l; do
-    [ -e "$(dirname "$f")/$l" ] || echo "link: broken $l in ${f#"$R"/}"; done; done | tee /tmp/.tokopt-links.$$ >&2
-[ -s /tmp/.tokopt-links.$$ ] && bad=1; rm -f /tmp/.tokopt-links.$$
+    [ -e "$(dirname "$f")/$l" ] || echo "link: broken $l in ${f#"$R"/}"; done; done | tee $TL >&2
+[ -s $TL ] && bad=1; rm -f $TL
 if grep -rIE 'ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA |EC )?PRIVATE KEY|sk-[A-Za-z0-9]{30,}' "$R" --exclude-dir=.git --exclude-dir=token-saving-mods >/dev/null; then echo "secret pattern found" >&2; bad=1; fi
 python3 -I - "$R" <<'PY' || bad=1
 import json, sys

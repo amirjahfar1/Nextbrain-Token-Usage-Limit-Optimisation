@@ -49,9 +49,9 @@ async function refreshToday($: EngineInterface) {
   if (data) await update($, today, () => data)
 }
 
-async function loadView($: EngineInterface, range: Range) {
+async function loadView($: EngineInterface, range: Range, quick = false) {
   await update($, view, v => ({ ...v, range, busy: true, error: '' }))
-  const { data, error } = await runReport($, range, true)
+  const { data, error } = await runReport($, range, true, quick)
   await update($, view, v => ({ ...v, busy: false, error, data: data ?? v.data }))
 }
 
@@ -89,7 +89,7 @@ export const register: Register = on => {
       }
     }
     await tick()
-    void loadView($, '7d').catch(() => undefined)
+    void loadView($, '7d', true).catch(() => undefined)
     void refreshToday($).catch(() => undefined)
     if (!running) {
       running = true
@@ -169,7 +169,7 @@ export const register: Register = on => {
           )}
           {u?.limits.map(l => (
             <Box flexDirection="column">
-              <Text dimColor>{l.kind.replace('_', ' ')} limit</Text>
+              <Text dimColor>{l.kind.replace(/_/g, ' ')} limit</Text>
               <Text>{bar(l.percent)} <Text bold>{l.percent}%</Text></Text>
             </Box>
           ))}

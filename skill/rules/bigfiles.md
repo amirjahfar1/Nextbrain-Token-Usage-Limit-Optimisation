@@ -18,4 +18,4 @@ Denied by `Read(...)` rules and the guard hook. Use the package manager (`pnpm w
 Never hand-edit a generated shard or index. Change the source and re-run the generator, then the size check.
 
 ## B6 New file over the limit
-Split it in the same change. `scripts/check-size.sh` fails the check otherwise.
+Split it in the same change (files of this system; an owner file over the limit is reported, never split without a yes). `scripts/check-size.sh` fails the check otherwise.

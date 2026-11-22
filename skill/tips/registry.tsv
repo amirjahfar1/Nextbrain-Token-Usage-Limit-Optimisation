@@ -5,9 +5,9 @@ K3	core	No big files: split into parent index plus small children in the same ch
 K4	core	Never invent token counts or percentages; label thresholds as heuristics.	reporting usage	rules/core.md#K4	rule
 K5	core	Optimise safely: verify, back up, ask before removing existing rules or hooks.	any optimisation	rules/core.md#K5	rule
 R1	reading	Locate first (CODEMAP, code graph, grep -n); never scan the whole tree.	before reading	rules/reading.md#R1	rule
-R2	reading	Read ranges with offset/limit; 2-5 files per task, else re-locate.	reading code	rules/reading.md#R2	hook
+R2	reading	Read ranges with offset/limit; only the files the task needs, else re-locate.	reading code	rules/reading.md#R2	hook
 R3	reading	Cap command output with head/tail; send long logs to a file and grep.	running commands	rules/reading.md#R3	rule
-R4	reading	Never re-read a file already in context or one you just edited.	before reading	rules/reading.md#R4	rule
+R4	reading	Do not re-read an unchanged file; do after a compaction or when a tool changed it.	before reading	rules/reading.md#R4	rule
 R5	reading	Query lockfiles and generated files with CLIs; never open them.	big generated file	rules/reading.md#R5	deny
 R6	reading	Source already printed by a tool counts as read; do not open it again.	after a tool printed code	rules/reading.md#R6	rule
 Q1	requests	Tiny clear request: say it back in one line, then do it.	small clear task	rules/requests.md#Q1	rule
@@ -32,14 +32,14 @@ M1	mcp	Measure connector and tool-list overhead with /context at session start.	
 M2	mcp	Disable unused MCP servers and connectors per project, with owner approval.	many connectors	rules/mcp.md#M2	rule
 M3	mcp	Prefer a local CLI over a connector for routine queries.	choosing a tool	rules/mcp.md#M3	rule
 M4	mcp	Personal enable/disable choices go in settings.local.json.	changing settings	rules/mcp.md#M4	rule
-L1	models	Route by role (planner, executor, economy); names live in config only.	choosing a model	rules/models.md#L1	rule
+L1	models	Route by role (planner, deep, executor, economy); names live in config only.	choosing a model	rules/models.md#L1	rule
 L2	models	Planner hands a short plan with acceptance checks to the executor.	planning to doing	rules/models.md#L2	rule
 L3	models	Do not switch model mid-slice; it can force an uncached re-read.	model switch	rules/models.md#L3	rule
 L4	models	If a configured model is unavailable, ask before substituting.	model missing	rules/models.md#L4	rule
 L5	models	Match reasoning effort to the task; keep standard speed to save usage.	starting a task	rules/models.md#L5	rule
 S1	session	One slice per session; fresh chat at a clean boundary.	new task	rules/session.md#S1	rule
 S2	session	Checkpoint (goal, decisions, files, checks, next action) before compact or clear.	context growing	rules/session.md#S2	rule
-S3	session	Heads-up near 65% (Claude) or 60% (Codex) used; label as heuristic.	context meter	rules/session.md#S3	rule
+S3	session	Claude Code: hand off near 50% used; Codex: heads-up near 60%; label as heuristic.	context meter	rules/session.md#S3	rule
 S4	session	After a long break checkpoint first; never ping just to warm the cache.	resuming	rules/session.md#S4	hook
 S5	session	Keep the prefix stable: batch instruction, tool, model, effort and image changes at a boundary.	editing config	rules/session.md#S5	rule
 S6	session	Unrelated tasks get their own chat.	new unrelated task	rules/session.md#S6	rule
@@ -59,8 +59,8 @@ W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	
 M5	mcp	Deny a bare mcp__<server> in permissions to drop its tools from context; scoped rules only block calls.	connector overhead	rules/mcp.md#M5	deny
 V6	review	Run /token-audit any time: overhead, big files, guard log, connectors. Read-only.	anytime	rules/session-review.md#V6	script
 S7	session	Run /handoff to write a checkpoint before clearing; the owner decides when to clear.	large context	rules/session.md#S7	script
-L6	models	Fable (the planner) only when the owner names it; deep work uses the Opus-class role, never Fable.	choosing a model	rules/models.md#L6	rule
+L6	models	Ask first: Fable (planner) only on the owner's yes; deep work uses the Opus-class role.	choosing a model	rules/models.md#L6	rule
 A5	subagents	Pick each subagent's model by tier (fast, balanced, deep); deep is Opus-class, risky work is always deep.	spawning a subagent	rules/subagents.md#A5	rule
 A6	subagents	Keep web research out of the main chat: a subagent returns a brief of about 200 words with sources.	web research	rules/subagents.md#A6	rule
 S8	session	Cache reads cost about 10% of input; /token-audit shows your cache hit ratio.	cache or cost questions	rules/session.md#S8	script
-K6	core	Universal token lessons from any project go back to the shared optimisation repo, stripped of project details.	after optimising a project	rules/core.md#K6	rule
+K6	core	Propose universal token lessons for the shared repo, stripped of project details; push only after a yes.	after optimising a project	rules/core.md#K6	rule

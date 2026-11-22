@@ -15,13 +15,23 @@ def sha(p):
     return hashlib.sha256(open(p, "rb").read()).hexdigest()[:16]
 
 
-def scan():
+def listing():
+    """Project files: git's list (tracked and untracked, honouring .gitignore, NUL separated so any name works),
+    else a walk that skips whole folders by name."""
     try:
-        fs = subprocess.run(["git", "ls-files"], capture_output=True, text=True, check=True).stdout.split("\n")
+        out = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], capture_output=True, check=True).stdout
+        return [x.decode("utf-8", "surrogateescape") for x in out.split(b"\0") if x]
     except Exception:
-        fs = [os.path.join(r, f) for r, ds, g in os.walk(".") if not any(s in r for s in SKIP) for f in g]
-    for f in filter(None, fs):
-        if any(s in f for s in SKIP) or f.lower().endswith(BINARY) or not os.path.isfile(f):
+        out = []
+        for r, ds, fs in os.walk("."):
+            ds[:] = [x for x in ds if x not in SKIP]
+            out += [os.path.relpath(os.path.join(r, f)) for f in fs]
+        return out
+
+
+def scan():
+    for f in listing():
+        if any(part in SKIP for part in f.split(os.sep)) or f.lower().endswith(BINARY) or not os.path.isfile(f):
             continue
         n, b = os.path.getsize(f), os.path.splitext(f)[1]
         ln = len(lines_of(f)) if n < 5_000_000 else 0

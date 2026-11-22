@@ -32,6 +32,11 @@ def match(rel, pats):
     return any(fnmatch.fnmatch(rel, p) or fnmatch.fnmatch("/" + rel, p) or fnmatch.fnmatch(rel, p.replace("**/", "")) for p in pats)
 
 
+def project_dir(d):
+    """The project root: Claude Code's CLAUDE_PROJECT_DIR, else the hook's cwd (a session may sit in a subfolder)."""
+    return os.environ.get("CLAUDE_PROJECT_DIR") or d.get("cwd") or os.getcwd()
+
+
 def state_dir(cwd):
     return os.path.join(cwd, ".claude", "token-optimisation")
 

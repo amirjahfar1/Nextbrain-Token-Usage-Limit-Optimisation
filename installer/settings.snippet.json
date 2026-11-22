@@ -8,11 +8,37 @@
     ]
   },
   "hooks": {
-    "PreToolUse": [{"matcher": "Read", "hooks": [{"type": "command",
-      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/guard_read.py"}]}],
-    "SessionStart": [{"hooks": [{"type": "command",
-      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/session_start.py"}]}],
-    "SessionEnd": [{"hooks": [{"type": "command", "timeout": 15,
-      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.agents/skills/token-optimisation/hooks/session_end.py"}]}]
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'f=\"${CLAUDE_PROJECT_DIR:-.}/.agents/skills/token-optimisation/hooks/guard_read.py\"; [ -f \"$f\" ] && command -v python3 >/dev/null 2>&1 || exit 0; exec python3 -B \"$f\"'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'f=\"${CLAUDE_PROJECT_DIR:-.}/.agents/skills/token-optimisation/hooks/session_start.py\"; [ -f \"$f\" ] && command -v python3 >/dev/null 2>&1 || exit 0; exec python3 -B \"$f\"'"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 15,
+            "command": "sh -c 'f=\"${CLAUDE_PROJECT_DIR:-.}/.agents/skills/token-optimisation/hooks/session_end.py\"; [ -f \"$f\" ] && command -v python3 >/dev/null 2>&1 || exit 0; exec python3 -B \"$f\"'"
+          }
+        ]
+      }
+    ]
   }
 }

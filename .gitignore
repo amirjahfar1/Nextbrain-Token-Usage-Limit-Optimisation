@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 token-saving-mods/
+tests/installer/w/
+tests/installer/logs/
+tests/installer/home/
+tests/installer/cfg/
+tests/installer/tmp/

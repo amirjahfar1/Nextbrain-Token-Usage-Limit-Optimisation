@@ -5,7 +5,7 @@ Mods are Claude Code only and install once for the whole Mac, so every project g
 Source: `mods/` (marketplace `nextbrain-mods`, six mods). Credits: `mods/NOTICE.md`.
 
 ## Install (automatic, nothing to do by hand)
-`sh install.sh --auto <project>` (START-HERE route 0) also installs or updates every mod for this Mac with the Claude Code CLI (`installer/mods.sh`). Mods only, no project needed: `sh install.sh --mods`. Skip with `--no-mods`. The mod list is read from `mods/.claude-plugin/marketplace.json`, so a new mod needs no script change. It checks each mod's installed version against the repo's: not installed, install; older, update; same, leave it. Running it again is safe. A mod change only reaches other Macs if its `plugin.json` and `marketplace.json` versions are bumped. The marketplace points at the folder the script ran from, so use the shared copy `~/.claude/nextbrain-token-system` (route 0) on every Mac.
+`sh install.sh --auto <project>` (START-HERE route 0) also installs or updates every mod for this Mac with the Claude Code CLI (`installer/mods.sh`), but only for a brand-new or already installed project: a project with its own rules gets a dry run and no mods until the owner agrees (adoption question 3), then `sh install.sh --mods`. Mods only, no project needed: `sh install.sh --mods`. Skip with `--no-mods`. The mod list is read from `mods/.claude-plugin/marketplace.json`, so a new mod needs no script change. It checks each mod's installed version against the repo's: not installed, install; older, update; same, leave it. Running it again is safe. A mod change only reaches other Macs if its `plugin.json` and `marketplace.json` versions are bumped. The marketplace points at the folder the script ran from, so use the shared copy `~/.claude/nextbrain-token-system` (route 0) on every Mac.
 
 ## Install by hand (only if the CLI was not found)
 Needs Claude Code 2.1.287+ (desktop app 2.1.286+). In Claude Code, with this repo's path:
@@ -27,7 +27,7 @@ The same works from a terminal with `claude plugin marketplace add <path>/mods` 
 | Mod | Rules it serves | What it does | Note |
 |---|---|---|---|
 | handoff | S3, S7 | Offers a Refresh handoff at 500k tokens | Constant `OFFER_AT` in its `register.tsx`; lower it on a 200k window |
-| model-router | A5, L3 | Haiku picks each subagent's model by tier | Tiers are Haiku, Sonnet, Opus: it never picks Fable (L6). A Fable model only inherited from the parent is moved down; one named on the Agent call is left alone. Never set `deepModel` to Fable. Never changes the main chat's model |
+| model-router | A5, L3 | Haiku picks each subagent's model by tier | Tiers are Haiku, Sonnet, Opus: it never picks Fable (L6). A model named on the Agent call is left alone; only an unnamed spawn is judged. Fable ranks above deep, so moving off an inherited Fable needs confidence 0.6; a Plan subagent of a Fable parent keeps Fable. Never set `deepModel` to Fable. Never changes the main chat's model |
 | cache-clock | S4, S8 | Countdown to a cold cache; opt-in `/keepwarm` | Keep warm stays off unless started |
 | research-router | A6 | Keeps web research out of the main chat | Auto on big WebSearch results; `/research-router` for a brief |
 | savings-proof | measure | `/savings` shows tokens the mods saved | Reads `~/.claude/mods-logs/savings.jsonl` |

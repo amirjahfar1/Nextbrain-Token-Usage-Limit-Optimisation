@@ -10,5 +10,5 @@ echo; echo "== Guard log (reads it flagged), top 5"
 echo; echo "== Big files (class suggestion)"
 python3 "$D/scripts/bigfile.py" scan 2>/dev/null | head -8
 echo; echo "== Over-limit docs/rules"
-sh "$D/scripts/check-size.sh" .agents .claude docs AGENTS.md CLAUDE.md 2>&1 | head -6
+sh "$D/scripts/check-size.sh" "$D" 2>&1 | head -6; echo "(the owner's own files are information only: no split or merge without a yes)"
 echo; echo "== Connectors: run /context and /mcp, list what this project does not use (rules/mcp.md M2, M5)"

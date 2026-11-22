@@ -2,6 +2,8 @@
 
 This repo is a token and usage-limit optimisation system for AI coding agents (Claude Code, Codex). Follow it; do not skim every file.
 
+**Step 0, every route and every new session (also route 4, update):** before reading the project, planning, installing or optimising anything, ask the owner the questions in `adoption/00-owner-questions.md`, the first being: "Plan with Fable (strongest, costs more) or with the current model?". Wait for the answer. Never pick Fable yourself; never switch models yourself.
+
 Pick ONE route:
 
 0. **You were given the GitHub URL, or the owner says the token system was updated (works in any project):** keep one shared copy: `[ -d ~/.claude/nextbrain-token-system ] || git clone <url> ~/.claude/nextbrain-token-system`, then `git -C ~/.claude/nextbrain-token-system pull --ff-only`, then `sh ~/.claude/nextbrain-token-system/install.sh --auto <project root>`. An installed project can just run `sh .agents/skills/token-optimisation/scripts/update.sh`. `--auto` also installs or updates the Claude Code mods on this Mac (`MODS.md`; `--no-mods` skips, `sh install.sh --mods` does only that), so on a new PC the owner does nothing by hand. `--auto` decides: installed, older: update plus the changelog since its version; installed, current: check; brand-new project: install plus check; project with its own rules: dry run only, then route 1. After it, do the "Next" line it prints. Private repo: uses the owner's git login; if clone fails, tell the owner.
@@ -9,7 +11,7 @@ Pick ONE route:
 1. **Existing project (default when unsure):** open `ADOPTION.md` first. Understand the project, plan in plan mode (the planner model only if the owner names it), change nothing until the owner approves.
 2. **Brand-new project:** `sh install.sh --dry-run <project>`, show the owner, then `sh install.sh <project>` and `--check`.
 3. **Already installed, daily use:** the project's `.agents/skills/token-optimisation/SKILL.md`. `/tips` or `$tips` prints every tip.
-4. **Already installed, owner says update:** `sh <this repo>/install.sh --check <project>`. If it says "update available", run `--update <project>`, then `--check` again. Read `CHANGELOG.md` from the project's old version (`<project>/.agents/skills/token-optimisation/VERSION`) to the new one and tell the owner what changed in 3 lines. Files the project edited are kept ("kept locally edited"): list them and ask before overwriting. Project overrides in `.agents/token-optimisation.conf` are never touched. `--auto` (route 0) also updates the Claude Code mods (`MODS.md`).
+4. **Already installed, owner says update:** `sh ~/.claude/nextbrain-token-system/install.sh --check <project>` (always the shared copy, never another folder). If it says "update available", run `--update <project>`, then `--check` again. Read `CHANGELOG.md` from the project's old version (`<project>/.agents/skills/token-optimisation/VERSION`) to the new one and tell the owner what changed in 3 lines. Files the project edited are kept ("kept locally edited"): list them; to take the new version of one, the owner deletes that file and you run `--update` again. Project overrides in `.agents/token-optimisation.conf` are never touched. `--auto` (route 0) also updates the Claude Code mods (`MODS.md`).
 
 Rules for you:
 - Open one child file per situation, never the whole repo.

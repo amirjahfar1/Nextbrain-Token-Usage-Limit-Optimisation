@@ -40,8 +40,9 @@ def start_of(rng):
 
 
 def parse_ts(s):
-    try: return dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    try: t = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
     except ValueError: return None
+    return t if t.tzinfo else t.replace(tzinfo=dt.timezone.utc)
 
 
 def n(u, k): return int(u.get(k) or 0)
@@ -53,11 +54,23 @@ def size(c):
     return 0
 
 
-def scan():
-    """One pass over every transcript: requests, tool calls, tool-result sizes, compactions, first cwd per session."""
+def transcripts():
+    """(path, session id): the main chats, and each chat's subagent transcripts (projects/<p>/<session>/subagents/*.jsonl)."""
+    base = os.path.join(CFG, "projects")
+    for p in glob.glob(os.path.join(base, "*", "*.jsonl")):
+        yield p, os.path.basename(p)[:-6]
+    for p in glob.glob(os.path.join(base, "*", "*", "subagents", "*.jsonl")):
+        yield p, os.path.basename(os.path.dirname(os.path.dirname(p)))
+
+
+def scan(min_mtime=0):
+    """One pass over the transcripts: requests, tool calls, tool-result sizes, compactions, first cwd per session.
+    min_mtime skips files not touched since then (a quick run only needs recent files)."""
     reqs, tools, res, comp, first = {}, {}, [], [], {}
-    for path in glob.glob(os.path.join(CFG, "projects", "*", "*.jsonl")):
-        sid = os.path.basename(path)[:-6]
+    for path, sid in transcripts():
+        try:
+            if min_mtime and os.path.getmtime(path) < min_mtime: continue
+        except OSError: continue
         for line in open(path, errors="replace"):
             if '"usage"' not in line and '"tool_use"' not in line and '"tool_result"' not in line and "compact" not in line: continue
             try: o = json.loads(line)
@@ -145,9 +158,13 @@ def system_root(cwd):
     """(project root, first install time) when the project has the token-optimisation system, else (None, None)."""
     d = cwd or ""
     for _ in range(8):
-        f = os.path.join(d, ".agents", "skills", "token-optimisation", "VERSION")
-        if os.path.isfile(f):
-            st = os.stat(f)
+        base = os.path.join(d, ".agents", "skills", "token-optimisation")
+        if os.path.isfile(os.path.join(base, "VERSION")):
+            # INSTALLED_AT is written once by the installer and survives updates and git checkouts; the file's
+            # creation or modification time is only the fallback for installs made before it existed.
+            at = parse_ts(open(os.path.join(base, "INSTALLED_AT")).read().strip()) if os.path.isfile(os.path.join(base, "INSTALLED_AT")) else None
+            if at: return d, at.timestamp()
+            st = os.stat(os.path.join(base, "VERSION"))
             return d, getattr(st, "st_birthtime", st.st_mtime)
         p = os.path.dirname(d)
         if p == d: break
@@ -240,13 +257,14 @@ def verdict(b):
     if not s["enough"]:
         return "Collecting data: need %d requests before and with the system (now %d before, %d with)." % (MIN_REQ, s["before"].get("requests", 0), s["after"].get("requests", 0))
     c = s["change_pct"]["cost_per_request"]
+    if c is None: return "Not comparable yet: the sessions before the system have no priced requests."
     return "With the system a request costs %s%d%% (indicative); about $%.2f %s over %d requests." % (
         "-" if c < 0 else "+", abs(c), abs(s["est_saved_usd"]), "saved" if s["est_saved_usd"] >= 0 else "extra", s["after"]["requests"])
 
 
 def build(rng, quick=False):
     start = start_of(rng)
-    reqs_all, tools_all, res, comp, first = scan()
+    reqs_all, tools_all, res, comp, first = scan(start.timestamp() if quick and rng != "all" else 0)
     reqs = {k: v for k, v in reqs_all.items() if v[0] >= start}
     tools = {k: v[1] for k, v in tools_all.items() if v[0] >= start}
     t = collections.Counter(); cost = 0.0; unpriced = 0
@@ -338,7 +356,7 @@ def markdown(r):
     L += ["", "## Top tools", ""] + [f"- {t['name']} x{t['n']}" for t in r["tools"]]
     L += ["", "## How this is counted", "",
           "- Tokens and sessions come from the chat transcripts, once per request. Cost is a list-price estimate, not a bill.",
-          "- Before/after compares sessions in a project before and after the system was installed there (the VERSION file's creation time), per request. Tasks differ between sessions, so treat it as an indicator that firms up with more sessions, not as proof.",
+          "- Before/after compares sessions in a project before and after the system was installed there (the INSTALLED_AT date the installer writes once), per request. Tasks differ between sessions, so treat it as an indicator that firms up with more sessions, not as proof.",
           "- Measured savings count only what the mods log (before and after tokens of an action). Savings from rules that stop waste before it happens (reading discipline) are only visible in the before/after numbers.",
           "- Saved % = kept out / (kept out + fresh input that did enter). Dollar savings from the ledger come from model routing only."]
     return "\n".join(L) + "\n"
@@ -351,7 +369,7 @@ if __name__ == "__main__":
     if "--md-out" in sys.argv:
         p = sys.argv[sys.argv.index("--md-out") + 1]
         if p == "auto": p = os.path.join(OUT, "report-%s.md" % rng)
-        os.makedirs(os.path.dirname(p), exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(p)), exist_ok=True)
         open(p, "w").write(markdown(r))
         r["md_path"] = p
     print(json.dumps(r) if "--json" in sys.argv else markdown(r))

@@ -1,4 +1,5 @@
-- Token rules (`.agents/skills/token-optimisation/`): read 2-5 files per task, with ranges, never re-read; cap command output.
+- Token rules (`.agents/skills/token-optimisation/`): locate first, read ranges, read what the task needs; do not re-read an unchanged file (do after a compaction or when a tool changed it); cap command output.
+- Never use or switch to the strongest model (Fable) on your own: ask the owner first (`rules/models.md` L6).
 - Tiny clear request: say it back in one line and do it. Bigger: short plan, 1-3 questions with defaults, wait for yes.
 - No recaps or file dumps in replies. Guarded big files are queried, not opened (`rules/bigfiles.md`).
 - `/tips` (Claude) or `$tips` (Codex) lists every optimisation; open one child file per situation.

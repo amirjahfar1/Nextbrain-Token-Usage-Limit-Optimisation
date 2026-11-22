@@ -24,4 +24,4 @@ Existing hooks on the same events; invalid settings JSON; managed settings; a ru
 ## Adopt selectively
 Take only what fits. An owner may reject size limits, model roles or session hooks: set `enforce_size=0`, leave `role_*` unused, install `--hooks=guard` or `--hooks=none`. The project's own rules win; never copy a rule the owner declined.
 - If project rules forbid reading session transcripts, skip the SessionEnd/SessionStart hooks (`--hooks=guard`). The cost report reads transcripts locally; do not run it where that is banned.
-- Use a planning model only when the owner names it in that message.
+- Use a planning model only when the owner said yes to the Fable question in Phase 0 (`adoption/00-owner-questions.md`).

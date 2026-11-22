@@ -192,6 +192,8 @@ export function rankOf(model: string, tiers: Tiers): number | null {
     const configured = tiers[tier].toLowerCase()
     if (configured && lowered.includes(configured)) return index
   }
+  // Nextbrain: Fable and Mythos sit above the deep tier, so moving off them is a downgrade that needs the strict bar.
+  if (/fable|mythos/.test(lowered)) return TIER_ORDER.length
   if (lowered.includes('haiku')) return 0
   if (lowered.includes('sonnet')) return 1
   if (lowered.includes('opus')) return 2

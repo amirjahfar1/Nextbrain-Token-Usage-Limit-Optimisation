@@ -4,7 +4,7 @@ Rule: open the parent only, then ONE child. Never a whole folder.
 
 | Level | File | Open when |
 |---|---|---|
-| Always loaded | 5-line block in AGENTS.md | automatic |
+| Always loaded | short block in CLAUDE.md or AGENTS.md | automatic |
 | Parent | `skill/SKILL.md` (40 lines) | any token/usage question; routes to one child |
 | Parent | `START-HERE.md` | this repo is handed to a project |
 | Parent | `ADOPTION.md` | project already has its own rules/hooks/settings |

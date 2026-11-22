@@ -587,9 +587,11 @@ export const register: Register = (on, options) => {
 
     // A fork inherits its parent's model; a resume keeps its own.
     if (!routeSubagentModel || e.fork || e.resume) return next(e)
-    // Nextbrain: a model named on the call that is Fable or Mythos was asked for by name (rules/models.md L6): leave it.
-    // A Fable model that is only inherited from the parent is still judged, so it moves down to the tier model.
-    if (asked && /fable|mythos/i.test(asked)) return next(e)
+    // Nextbrain: a model named on the call (by the owner, an agent definition or Claude) is the owner's choice: leave it
+    // (rules/models.md L6, A5). Only a spawn that names no model is judged, so Fable is never picked or kept by the router.
+    if (asked) return next(e)
+    // An inherited Fable parent running a planning subagent: the owner chose Fable for planning, keep it.
+    if (/fable|mythos/i.test(e.parentModel ?? '') && /plan/i.test(e.subagentType ?? '')) return next(e)
 
     // The pane's card goes up before Haiku answers, so the judging shows.
     const cardId = await addCard($, {

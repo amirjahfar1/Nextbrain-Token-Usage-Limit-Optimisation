@@ -1,6 +1,6 @@
 ---
 name: token-optimisation
-description: Reduce token and usage-limit cost: reading discipline, big-file handling, context and session hygiene, MCP overhead, model routing, expensive-session review. Use for usage tips, token savings, large files, or when a session was flagged expensive.
+description: "Reduce token and usage-limit cost: reading discipline, big-file handling, context and session hygiene, MCP overhead, model routing, expensive-session review. Use for usage tips, token savings, large files, or when a session was flagged expensive."
 ---
 
 Open ONE child for the situation, never all. Print every tip with `sh scripts/tips.sh --all` (or `tips.sh <area-letter>`).
