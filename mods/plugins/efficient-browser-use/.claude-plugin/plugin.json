@@ -1,0 +1,5 @@
+{
+  "name": "efficient-browser-use",
+  "version": "0.1.0",
+  "description": "Keeps browser work cheap: smaller default screenshots, page text, console and network reads for the built-in browser, plus a short rule to read pages as text. Explicit values are never overridden."
+}

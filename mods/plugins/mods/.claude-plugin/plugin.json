@@ -1,0 +1,5 @@
+{
+  "name": "mods",
+  "version": "0.1.0",
+  "description": "/mods shows every Nextbrain mod and turns each on or off in every chat (switches.json): /mods, /mods off <name>, /mods on <name>, /mods on all."
+}

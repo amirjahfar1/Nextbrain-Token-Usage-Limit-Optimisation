@@ -1,0 +1,5 @@
+{
+  "name": "effort-optimizer",
+  "version": "0.1.0",
+  "description": "Lowers thinking effort to low for trivial prompts (thanks, ok, commit, push). Never raises effort and never touches hard or long prompts. No model call."
+}

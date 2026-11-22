@@ -1,0 +1,5 @@
+{
+  "name": "input-router",
+  "version": "0.1.0",
+  "description": "Trims your prompt before Claude reads it: extra blank lines, trailing spaces and long runs of identical pasted lines. Code blocks are never touched. No model call, no cost."
+}
