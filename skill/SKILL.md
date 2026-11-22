@@ -20,11 +20,11 @@ Tip areas (generated):
 - reading (6 tips) -> rules/reading.md
 - requests (6 tips) -> rules/requests.md
 - output (3 tips) -> rules/output.md
-- subagents (4 tips) -> rules/subagents.md
+- subagents (6 tips) -> rules/subagents.md
 - bigfiles (6 tips) -> rules/bigfiles.md
 - mcp (5 tips) -> rules/mcp.md
-- models (5 tips) -> rules/models.md
-- session (7 tips) -> rules/session.md
+- models (6 tips) -> rules/models.md
+- session (8 tips) -> rules/session.md
 - measure (3 tips) -> rules/measure.md
 - review (6 tips) -> rules/session-review.md
 - codex (2 tips) -> rules/codex.md

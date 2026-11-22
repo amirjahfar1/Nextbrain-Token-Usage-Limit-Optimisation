@@ -55,7 +55,11 @@ def compute(path):
     ins = [side_in(u) for u in usage.values()]
     first = side_in(next(iter(usage.values()))) if usage else None
     mcp = {k: v for k, v in res.items() if k.startswith("mcp__")}
+    cw = sum(int(u.get("cache_creation_input_tokens") or 0) for u in usage.values())
+    cr = sum(int(u.get("cache_read_input_tokens") or 0) for u in usage.values())
+    ni = sum(int(u.get("input_tokens") or 0) for u in usage.values())
     return {
+        "cache_hit": round(100 * cr / (cr + cw + ni)) if (cr + cw + ni) else None,
         "requests": len(usage), "user_turns": users, "models": models,
         "input_new": sum(int(u.get("input_tokens") or 0) for u in usage.values()),
         "cache_write": sum(int(u.get("cache_creation_input_tokens") or 0) for u in usage.values()),

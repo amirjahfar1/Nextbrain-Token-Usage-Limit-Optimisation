@@ -7,7 +7,7 @@ CB=$(cfg max_code_bytes 8192); DL=$(cfg max_data_lines 120); EL=$(cfg max_entry_
 [ $# -gt 0 ] || set -- .
 bad=0
 find "$@" -type f -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/dist/*' \
-  -not -path '*/.claude/token-optimisation/*' 2>/dev/null | while read -r f; do
+  -not -path '*/.claude/token-optimisation/*' -not -path '*/token-saving-mods/*' -not -path '*/mods/plugins/*' 2>/dev/null | while read -r f; do
   b=$(basename "$f"); lines=$(wc -l < "$f" | tr -d ' '); bytes=$(wc -c < "$f" | tr -d ' ')
   case "$b" in
     pnpm-lock.yaml|package-lock.json|yarn.lock) echo "BIG(never-open): $f ($bytes bytes) -> class never"; continue ;;

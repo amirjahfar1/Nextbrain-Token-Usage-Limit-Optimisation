@@ -1,4 +1,4 @@
-# 2. Plan with the strongest model
+# 2. Plan (the strongest model only if the owner names it)
 
 Plan mode, no edits. Produce a short plan the owner can approve.
 

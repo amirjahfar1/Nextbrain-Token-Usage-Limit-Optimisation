@@ -9,10 +9,13 @@ Roles, not names. Names live in `config/defaults.conf` (owner-configurable, date
 The planner ends with: scope, decisions, open questions, acceptance checks. The executor receives that short plan, not the planning chat.
 
 ## L3 Do not switch model mid-slice
-A model switch can force the next request to re-read the whole conversation uncached. Switch only at a clean boundary.
+A model switch, and likely an effort change, can force the next request to re-read the whole conversation uncached (`session.md` S8). Switch only at a clean boundary.
 
 ## L4 Ask before substituting
 If a configured model is unavailable, tell the owner and confirm a substitute first.
+
+## L6 The strongest model is gated
+The planner role (Fable, or the strongest model available) runs only when the owner names it for that task or session. Never pick it yourself for a subagent, the deep tier, a plan, a review or adoption; "hard" or "important" is not a request for it. Hard work uses `role_deep` (Opus-class) at normal effort. If a task seems to need the planner, say so in one line and ask.
 
 ## L5 Match effort to the task
 Low effort for lookups and clear edits; high only for design and hard debugging. Keep standard speed when saving usage.

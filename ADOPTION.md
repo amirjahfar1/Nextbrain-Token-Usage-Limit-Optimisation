@@ -2,7 +2,7 @@
 
 Goal: cut token and usage cost WITHOUT breaking or degrading what already works. Read-only until the plan is approved.
 
-**Phase 0: model.** Switch to the strongest planning model available (`role_planner` in `skill/config/defaults.conf`; Fable if the owner has it). Use plan mode. No edits yet.
+**Phase 0: model.** Stay on the current (executor) model and use plan mode. Use the planner (`role_planner`, Fable) only if the owner names it in that message (rules/models.md L6). No edits yet.
 
 | Phase | Open | Output |
 |---|---|---|

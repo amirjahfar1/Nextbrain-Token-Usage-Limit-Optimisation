@@ -31,10 +31,12 @@ else:
     lat = rows[-1]
     out += ["Sessions: %d%s. Latest fixed overhead: %s tok. Latest peak context: %s tok." % (
         n, " (thresholds need 10)" if n < 10 else "", lat["fixed_overhead"], lat["peak_context"]), "",
-        "## Last sessions", "", "| date | requests | peak ctx | tool results (chars) | MCP chars | flags |", "|---|---|---|---|---|---|"]
+        "## Last sessions", "", "| date | requests | peak ctx | cache hit | tool results (chars) | MCP chars | flags |", "|---|---|---|---|---|---|---|"]
     for r in rows[-8:]:
-        out.append("| %s | %s | %s | %s | %s | %s |" % (time.strftime("%m-%d %H:%M", time.localtime(r["ts"])), r["requests"],
-                   r["peak_context"], r["tool_result_chars"], r["mcp_result_chars"], "; ".join(r["flags"]) or "-"))
+        h = r.get("cache_hit")
+        out.append("| %s | %s | %s | %s | %s | %s | %s |" % (time.strftime("%m-%d %H:%M", time.localtime(r["ts"])), r["requests"],
+                   r["peak_context"], "-" if h is None else "%d%%" % h, r["tool_result_chars"], r["mcp_result_chars"], "; ".join(r["flags"]) or "-"))
+    chits = [r["cache_hit"] for r in rows if r.get("cache_hit") is not None]
     tool = collections.Counter(); item = collections.Counter(); hits = collections.Counter(); rep = collections.Counter()
     for r in rows:
         tool.update(r.get("by_tool", {}))
@@ -53,6 +55,7 @@ else:
     if any(r["compactions"] for r in rows): sug.append("S2 checkpoint; S1 one slice per session")
     if any(len(r["models"]) > 1 for r in rows): sug.append("L3 do not switch model mid-slice")
     if sum(r["mcp_result_chars"] for r in rows) * 3 > tot: sug.append("M2/M5 trim connectors")
+    if len(chits) >= 3 and sum(chits) / len(chits) < 50: sug.append("S5/L3/S4 cache hit averages %d%% (heuristic: low below 50%%)" % (sum(chits) / len(chits)))
     if tool.get("Bash", 0) * 2 > tot: sug.append("R3 cap command output (head/tail)")
     out += ["", "## Suggestions (tip ids)", ""] + ["- " + x for x in sug[:4]] if sug else ["", "No structural problem found yet."]
 open(os.path.join(state, "report.md"), "w").write("\n".join(out) + "\n")

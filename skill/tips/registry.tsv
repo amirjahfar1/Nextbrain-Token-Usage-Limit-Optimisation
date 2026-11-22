@@ -41,7 +41,7 @@ S1	session	One slice per session; fresh chat at a clean boundary.	new task	rules
 S2	session	Checkpoint (goal, decisions, files, checks, next action) before compact or clear.	context growing	rules/session.md#S2	rule
 S3	session	Heads-up near 65% (Claude) or 60% (Codex) used; label as heuristic.	context meter	rules/session.md#S3	rule
 S4	session	After a long break checkpoint first; never ping just to warm the cache.	resuming	rules/session.md#S4	hook
-S5	session	Keep the prefix stable: batch instruction, tool and model changes at a boundary.	editing config	rules/session.md#S5	rule
+S5	session	Keep the prefix stable: batch instruction, tool, model, effort and image changes at a boundary.	editing config	rules/session.md#S5	rule
 S6	session	Unrelated tasks get their own chat.	new unrelated task	rules/session.md#S6	rule
 X1	measure	Record /context and /usage at start and end in baseline.md.	session start or end	rules/measure.md#X1	rule
 X2	measure	First-request input size is the fixed overhead; session_cost.py prints it.	checking overhead	rules/measure.md#X2	script
@@ -59,4 +59,8 @@ W2	commands	Codex: $tips /status /compact /plan /model /reasoning /mcp /review.	
 M5	mcp	Deny a bare mcp__<server> in permissions to drop its tools from context; scoped rules only block calls.	connector overhead	rules/mcp.md#M5	deny
 V6	review	Run /token-audit any time: overhead, big files, guard log, connectors. Read-only.	anytime	rules/session-review.md#V6	script
 S7	session	Run /handoff to write a checkpoint before clearing; the owner decides when to clear.	large context	rules/session.md#S7	script
+L6	models	Fable (the planner) only when the owner names it; deep work uses the Opus-class role, never Fable.	choosing a model	rules/models.md#L6	rule
+A5	subagents	Pick each subagent's model by tier (fast, balanced, deep); deep is Opus-class, risky work is always deep.	spawning a subagent	rules/subagents.md#A5	rule
+A6	subagents	Keep web research out of the main chat: a subagent returns a brief of about 200 words with sources.	web research	rules/subagents.md#A6	rule
+S8	session	Cache reads cost about 10% of input; /token-audit shows your cache hit ratio.	cache or cost questions	rules/session.md#S8	script
 K6	core	Universal token lessons from any project go back to the shared optimisation repo, stripped of project details.	after optimising a project	rules/core.md#K6	rule

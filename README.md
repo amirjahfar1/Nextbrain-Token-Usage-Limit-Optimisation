@@ -6,6 +6,7 @@ Private, portable system that lowers token use and protects usage limits for Cla
 - Guards for big and generated files, index and shard tools for managing them.
 - Expensive-session review: every session is recorded; a flagged one prompts a cost report and suggested fixes, applied only with owner approval.
 - `/tips` or `$tips` prints every optimisation, generated from one registry.
+- Optional Claude Code mods, installed once for all projects: `MODS.md`.
 - Safe adoption path for existing projects (`ADOPTION.md`). Reading map: `MAP.md`. Commands: `/tips`, `/token-audit` (usage report, see `skill/guides/token-audit.md`), `/handoff`.
 
 ## Use it

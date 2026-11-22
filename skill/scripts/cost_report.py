@@ -49,7 +49,7 @@ def report(c, flags, tips, status):
     out = ["Session cost: %s [%s]" % ("FLAGGED: " + ", ".join(flags) if flags else "ok", status),
            "requests %s, user turns %s, models %s" % (c["requests"], c["user_turns"], ",".join(c["models"]) or "n/a"),
            "peak context %s tok, fixed overhead %s tok" % (c["peak_context"], c["fixed_overhead"]),
-           "cache write %s, cache read %s, new input %s, output %s" % (c["cache_write"], c["cache_read"], c["input_new"], c["output"]),
+           "cache write %s, cache read %s (hit %s), new input %s, output %s" % (c["cache_write"], c["cache_read"], "n/a" if c["cache_hit"] is None else "%d%%" % c["cache_hit"], c["input_new"], c["output"]),
            "tool results %s chars (MCP %s), compactions %s" % (c["tool_result_chars"], c["mcp_result_chars"], c["compactions"]),
            "Top drivers:"]
     out += ["  %s chars  %s %s" % t for t in c["top_results"][:3]] or ["  n/a"]
@@ -64,7 +64,7 @@ def make_row(path, c, flags):
             "peak_context": c["peak_context"], "fixed_overhead": c["fixed_overhead"], "models": c["models"],
             "tool_result_chars": c["tool_result_chars"], "mcp_result_chars": c["mcp_result_chars"],
             "by_tool": c["result_by_tool"], "top": [[n, str(t)[:50], z] for z, n, t in c["top_results"][:3]],
-            "repeated_reads": c["repeated_full_reads"], "compactions": c["compactions"], "flags": flags}
+            "repeated_reads": c["repeated_full_reads"], "cache_hit": c["cache_hit"], "compactions": c["compactions"], "flags": flags}
 
 
 def main(argv):
