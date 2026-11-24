@@ -1,6 +1,6 @@
 {
   "name": "session-header",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A thin, always-on row above the prompt: the current working folder plus the account's 5 hour and weekly limits and when each resets. Never hides. No model call, no cost.",
   "types": "./types/index.d.ts",
   "author": {

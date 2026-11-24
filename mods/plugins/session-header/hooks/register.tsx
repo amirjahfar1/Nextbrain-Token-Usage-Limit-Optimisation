@@ -25,16 +25,21 @@ const tilde = (p: string) => (home && p.startsWith(home) ? `~${p.slice(home.leng
 // Change a tag when the stored fields change: it declines what an earlier version stored.
 const limits = atom({ plugin: 'session-header', key: 'limits' } as const, [] as LimitInfo[], { shape: 'limits-1' })
 
-// How long until an ISO timestamp, as "2h 14m" / "38m" / "now".
+// How long until an ISO timestamp: "5d 3h 30m" past a day, else "2h 14m" / "38m" / "now".
 function untilLabel(resetsAt: string | null, nowMs: number): string {
   if (!resetsAt) return ''
   const ms = new Date(resetsAt).getTime() - nowMs
   if (!Number.isFinite(ms) || ms <= 0) return 'resets now'
   const mins = Math.round(ms / 60_000)
   if (mins < 1) return '<1m left'
-  const h = Math.floor(mins / 60)
+  const totalHours = Math.floor(mins / 60)
   const m = mins % 60
-  return h > 0 ? `${h}h ${m}m left` : `${m}m left`
+  if (totalHours >= 24) {
+    const d = Math.floor(totalHours / 24)
+    const h = totalHours % 24
+    return `${d}d ${h}h ${m}m left`
+  }
+  return totalHours > 0 ? `${totalHours}h ${m}m left` : `${m}m left`
 }
 
 const GOOD = '#4ade80'

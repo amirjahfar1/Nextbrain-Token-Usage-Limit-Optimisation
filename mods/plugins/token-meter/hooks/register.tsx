@@ -27,9 +27,14 @@ function untilLabel(resetsAt: string | null, nowMs: number): string {
   if (!Number.isFinite(ms) || ms <= 0) return 'resets now'
   const mins = Math.round(ms / 60_000)
   if (mins < 1) return 'resets <1m'
-  const h = Math.floor(mins / 60)
+  const totalHours = Math.floor(mins / 60)
   const m = mins % 60
-  return `resets in ${h > 0 ? `${h}h ${m}m` : `${m}m`}`
+  if (totalHours >= 24) {
+    const d = Math.floor(totalHours / 24)
+    const h = totalHours % 24
+    return `resets in ${d}d ${h}h ${m}m`
+  }
+  return `resets in ${totalHours > 0 ? `${totalHours}h ${m}m` : `${m}m`}`
 }
 
 const C = { title: '#c4b5fd', accent: '#a78bfa', blue: '#60a5fa', good: '#4ade80', warn: '#fbbf24', bad: '#f87171', border: '#6d5bd0' }
