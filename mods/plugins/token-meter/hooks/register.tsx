@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Range, Report, Usage, View } from '../types'
+import type { AgentSummary, Range, Report, Usage, View } from '../types'
 
 const NAME = 'token-meter'
 const PANE = 'token-meter'
@@ -9,14 +9,29 @@ const REPORT_PANE = 'token-meter-report'
 const RANGES: Range[] = ['today', '7d', '30d', 'all']
 const LABEL: Record<Range, string> = { today: 'Today', '7d': '7 days', '30d': '30 days', all: 'All time' }
 const FRESH_MS = 60_000
+const LIMIT_LABEL: Record<string, string> = { five_hour: '5 hour limit', seven_day: 'Weekly limit', spend_limit: 'Spend limit' }
 
 // Change a tag when the stored fields change: it declines what an earlier version stored.
-const usage = atom({ plugin: 'token-meter', key: 'usage' } as const, null, { shape: 'usage-1' })
+const usage = atom({ plugin: 'token-meter', key: 'usage' } as const, null, { shape: 'usage-2' })
 const tools = atom({ plugin: 'token-meter', key: 'tools' } as const, {}, { shape: 'tools-1' })
 const today = atom({ plugin: 'token-meter', key: 'today' } as const, null, { shape: 'today-2' })
 const view = atom({ plugin: 'token-meter', key: 'view' } as const, { range: '7d', busy: false, error: '', data: null } as View, {
   shape: 'view-2',
 })
+const agents = atom({ plugin: 'token-meter', key: 'agents' } as const, [] as AgentSummary[], { shape: 'agents-1' })
+const bandHidden = atom({ plugin: 'token-meter', key: 'bandHidden' } as const, false, { shape: 'bandHidden-1' })
+
+// How long until an ISO timestamp, as "2h 14m" / "38m" / "now".
+function untilLabel(resetsAt: string | null, nowMs: number): string {
+  if (!resetsAt) return ''
+  const ms = new Date(resetsAt).getTime() - nowMs
+  if (!Number.isFinite(ms) || ms <= 0) return 'resets now'
+  const mins = Math.round(ms / 60_000)
+  if (mins < 1) return 'resets <1m'
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return `resets in ${h > 0 ? `${h}h ${m}m` : `${m}m`}`
+}
 
 const C = { title: '#c4b5fd', accent: '#a78bfa', blue: '#60a5fa', good: '#4ade80', warn: '#fbbf24', bad: '#f87171', border: '#6d5bd0' }
 const tone = (pct: number) => (pct < 60 ? C.good : pct < 85 ? C.warn : C.bad)
@@ -79,11 +94,20 @@ export const register: Register = on => {
           tokens: u.context.tokens ?? null,
           window: u.context.window,
           cost: u.cost?.usd ?? null,
-          limits: u.rateLimits.map(r => ({ kind: r.kind, percent: Math.round(r.percentUsed) })),
+          limits: u.rateLimits.map(r => ({ kind: r.kind, percent: Math.round(r.percentUsed), resetsAt: r.resetsAt ?? null })),
           model: await $.session.model(),
           folder: parts[parts.length - 1] ?? '/',
         }
         await update($, usage, () => value)
+      } catch {
+        // keep the last good reading
+      }
+      try {
+        const list = await $.agent.list()
+        const live = list
+          .filter(a => a.status === 'running' || a.status === 'pending' || a.taskStatus === 'running' || a.taskStatus === 'pending')
+          .map(a => ({ id: a.id, label: a.label || a.description, type: a.type, status: a.status, tokenCount: a.tokenCount }))
+        await update($, agents, () => live)
       } catch {
         // keep the last good reading
       }
@@ -134,6 +158,44 @@ export const register: Register = on => {
     if (p) await $.process.run(['open', '-t', p]).catch(() => undefined)
     return { element: e.element }
   })
+  on('ui.press', { plugin: NAME, element: 'band-hide' }, async ($, e) => {
+    await update($, bandHidden, () => true)
+    return { element: e.element }
+  })
+  on('ui.press', { plugin: NAME, element: 'band-show' }, async ($, e) => {
+    await update($, bandHidden, () => false)
+    return { element: e.element }
+  })
+
+  // ---- the floating limits widget, above the prompt ----
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    const rest = await next(e)
+    const hidden = await read($, bandHidden)
+    if (hidden) return rest
+    const u = await read($, usage)
+    if (!u || u.limits.length === 0) return rest
+    const { Box, Text, Button } = $.ui.resolve(e)
+    const now = await $.clock.now()
+    const noop = () => undefined
+    return (
+      <Box flexDirection="column">
+        {rest}
+        <Box flexDirection="row" alignItems="center" justifyContent="space-between" gap={1}>
+          <Text>
+            {u.limits.map((l, i) => (
+              <Text key={l.kind}>
+                {i > 0 ? <Text dimColor>  ·  </Text> : null}
+                <Text dimColor>{(LIMIT_LABEL[l.kind] ?? l.kind).replace(' limit', '')} </Text>
+                <Text bold color={tone(l.percent)}>{l.percent}%</Text>
+                {l.resetsAt ? <Text dimColor> ({untilLabel(l.resetsAt, now)})</Text> : null}
+              </Text>
+            ))}
+          </Text>
+          <Button key="band-hide" label="Hide" role="dismiss" onPress={noop} />
+        </Box>
+      </Box>
+    )
+  })
 
   // ---- the meter pane ----
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
@@ -141,6 +203,9 @@ export const register: Register = on => {
     const u = await read($, usage)
     const used = await read($, tools)
     const t = await read($, today)
+    const live = await read($, agents)
+    const now = await $.clock.now()
+    const hidden = await read($, bandHidden)
     const width = Math.max(12, Math.min(36, (e.props.bodyColumns ?? 40) - 10))
     const bar = (p: number) => {
       const filled = Math.round((Math.min(100, Math.max(0, p)) / 100) * width)
@@ -169,11 +234,29 @@ export const register: Register = on => {
           )}
           {u?.limits.map(l => (
             <Box flexDirection="column">
-              <Text dimColor>{l.kind.replace(/_/g, ' ')} limit</Text>
+              <Text dimColor>{LIMIT_LABEL[l.kind] ?? `${l.kind.replace(/_/g, ' ')} limit`}</Text>
               <Text>{bar(l.percent)} <Text bold>{l.percent}%</Text></Text>
+              {l.resetsAt && <Text dimColor>{untilLabel(l.resetsAt, now)}</Text>}
             </Box>
           ))}
           {u?.cost != null && <Text dimColor>≈ ${u.cost.toFixed(2)} spent (estimate)</Text>}
+          {hidden && <Button key="band-show" label="Show limits above prompt" variant="secondary" onPress={() => undefined} />}
+        </Box>
+
+        <Box {...card}>
+          <Text bold color={C.title}>Active Agents {live.length > 0 ? `(${live.length})` : ''}</Text>
+          {live.length === 0 ? (
+            <Text dimColor>No subagents running right now.</Text>
+          ) : (
+            live.map(a => (
+              <Box key={a.id} flexDirection="column">
+                <Text>
+                  <Text color={C.accent}>●</Text> <Text bold>{a.type}</Text> <Text dimColor>({a.status})</Text>
+                </Text>
+                <Text dimColor wrap="truncate-end">{a.label}</Text>
+              </Box>
+            ))
+          )}
         </Box>
 
         <Box {...card}>

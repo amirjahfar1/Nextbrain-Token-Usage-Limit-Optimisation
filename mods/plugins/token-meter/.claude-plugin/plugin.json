@@ -1,7 +1,7 @@
 {
   "name": "token-meter",
-  "version": "0.3.0",
-  "description": "A Token Meter pane (context, five hour and seven day limits, cost, top tools, savings today) with a Full report button: sessions, input, output, cache hit, measured savings and a before/after check of whether the system is paying off, for today, 7 days, 30 days or all time",
+  "version": "0.4.0",
+  "description": "A Token Meter pane (context, five hour and seven day limits with reset time, active subagents, cost, top tools, savings today) with a Full report button, plus a small floating widget above the prompt showing the 5 hour and weekly limits and when each resets",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Nextbrain"

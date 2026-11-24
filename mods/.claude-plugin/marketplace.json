@@ -3,7 +3,7 @@
   "owner": {
     "name": "Nextbrain"
   },
-  "description": "Claude Code mods that cut token cost or show it: handoff, model-router, cache-clock, research-router, savings-proof, token-meter, input-router, effort-optimizer, efficient-browser-use, mods. Claude Code only; the repo rules in skill/ stay universal.",
+  "description": "Claude Code mods that cut token cost or show it: handoff, model-router, cache-clock, research-router, savings-proof, token-meter, input-router, effort-optimizer, efficient-browser-use, session-header, mods. Claude Code only; the repo rules in skill/ stay universal.",
   "plugins": [
     {
       "name": "handoff",
@@ -38,8 +38,14 @@
     {
       "name": "token-meter",
       "source": "./plugins/token-meter",
-      "description": "Token Meter pane (context, limits, cost, top tools, savings today) with a Full report button: sessions, tokens, cache hit, measured savings and a before/after check of whether the system pays off",
-      "version": "0.3.0"
+      "description": "Token Meter pane (context, limits with reset time, active subagents, cost, top tools, savings today) with a Full report button, plus a small floating widget above the prompt for the 5 hour and weekly limits",
+      "version": "0.4.0"
+    },
+    {
+      "name": "session-header",
+      "source": "./plugins/session-header",
+      "description": "A thin sticky row above the prompt showing the current working folder and the chat's first few words",
+      "version": "0.1.0"
     },
     {
       "name": "input-router",
@@ -63,7 +69,7 @@
       "name": "mods",
       "source": "./plugins/mods",
       "description": "/mods lists every Nextbrain mod and turns each on or off in every chat: /mods, /mods off <name>, /mods on <name>, /mods on all",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }

@@ -5,9 +5,17 @@ export type Usage = {
   tokens: number | null
   window: number
   cost: number | null
-  limits: { kind: string; percent: number }[]
+  limits: { kind: string; percent: number; resetsAt: string | null }[]
   model: string
   folder: string
+}
+
+export type AgentSummary = {
+  id: string
+  label: string
+  type: string
+  status: string
+  tokenCount: number
 }
 
 export type Metrics = {
@@ -80,6 +88,8 @@ declare module 'claude-code' {
       tools: Shaped<Record<string, number>>
       today: Shaped<Report | null>
       view: Shaped<View>
+      agents: Shaped<AgentSummary[]>
+      bandHidden: Shaped<boolean>
     }
   }
 }

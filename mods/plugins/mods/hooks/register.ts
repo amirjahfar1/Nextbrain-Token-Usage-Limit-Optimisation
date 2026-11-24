@@ -15,6 +15,7 @@ const KNOWN: Record<string, string> = {
   'input-router': 'trims prompt noise',
   'effort-optimizer': 'low effort for trivial prompts',
   'efficient-browser-use': 'smaller browser reads',
+  'session-header': 'folder + chat title row above the prompt',
 }
 
 let dir = ''
