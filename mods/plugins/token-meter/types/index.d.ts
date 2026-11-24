@@ -89,7 +89,6 @@ declare module 'claude-code' {
       today: Shaped<Report | null>
       view: Shaped<View>
       agents: Shaped<AgentSummary[]>
-      bandHidden: Shaped<boolean>
     }
   }
 }

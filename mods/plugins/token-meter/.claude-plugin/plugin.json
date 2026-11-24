@@ -1,7 +1,7 @@
 {
   "name": "token-meter",
-  "version": "0.4.1",
-  "description": "A Token Meter pane (context, five hour and seven day limits with reset time, active subagents, cost, top tools, savings today) with a Full report button, plus a small floating widget above the prompt showing the 5 hour and weekly limits and when each resets",
+  "version": "0.5.0",
+  "description": "A Token Meter pane (context, five hour and seven day limits with reset time, active subagents, cost, top tools, savings today) with a Full report button. The 5 hour and weekly limits also show in the always-on row the session-header mod draws above the prompt.",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Nextbrain"

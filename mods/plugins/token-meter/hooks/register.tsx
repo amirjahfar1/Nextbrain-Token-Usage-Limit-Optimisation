@@ -19,7 +19,6 @@ const view = atom({ plugin: 'token-meter', key: 'view' } as const, { range: '7d'
   shape: 'view-2',
 })
 const agents = atom({ plugin: 'token-meter', key: 'agents' } as const, [] as AgentSummary[], { shape: 'agents-1' })
-const bandHidden = atom({ plugin: 'token-meter', key: 'bandHidden' } as const, false, { shape: 'bandHidden-1' })
 
 // How long until an ISO timestamp, as "2h 14m" / "38m" / "now".
 function untilLabel(resetsAt: string | null, nowMs: number): string {
@@ -35,16 +34,6 @@ function untilLabel(resetsAt: string | null, nowMs: number): string {
 
 const C = { title: '#c4b5fd', accent: '#a78bfa', blue: '#60a5fa', good: '#4ade80', warn: '#fbbf24', bad: '#f87171', border: '#6d5bd0' }
 const tone = (pct: number) => (pct < 60 ? C.good : pct < 85 ? C.warn : C.bad)
-const MINI_BAR_WIDTH = 8
-const miniBar = (p: number, width = MINI_BAR_WIDTH) => {
-  const filled = Math.round((Math.min(100, Math.max(0, p)) / 100) * width)
-  return (
-    <Text>
-      <Text color={tone(p)}>{'▰'.repeat(filled)}</Text>
-      <Text dimColor>{'▱'.repeat(width - filled)}</Text>
-    </Text>
-  )
-}
 const fmt = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : `${Math.round(n)}`)
 const pct = (v: number | null) => (v === null ? 'n/a' : `${v}%`)
 const usd = (v: number) => `$${v.toFixed(2)}`
@@ -168,55 +157,8 @@ export const register: Register = on => {
     if (p) await $.process.run(['open', '-t', p]).catch(() => undefined)
     return { element: e.element }
   })
-  on('ui.press', { plugin: NAME, element: 'band-hide' }, async ($, e) => {
-    await update($, bandHidden, () => true)
-    return { element: e.element }
-  })
-  on('ui.press', { plugin: NAME, element: 'band-show' }, async ($, e) => {
-    await update($, bandHidden, () => false)
-    return { element: e.element }
-  })
-
-  // ---- the floating limits widget, above the prompt ----
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    const rest = await next(e)
-    const u = await read($, usage)
-    if (!u || u.limits.length === 0) return rest
-    const { Box, Text, Button } = $.ui.resolve(e)
-    const hidden = await read($, bandHidden)
-    const noop = () => undefined
-
-    if (hidden) {
-      return (
-        <Box flexDirection="column">
-          {rest}
-          <Box flexDirection="row" justifyContent="flex-end">
-            <Button key="band-show" label="Limits" variant="secondary" onPress={noop} />
-          </Box>
-        </Box>
-      )
-    }
-
-    const now = await $.clock.now()
-    return (
-      <Box flexDirection="column">
-        {rest}
-        <Box flexDirection="row" alignItems="center" justifyContent="space-between" gap={2}>
-          <Box flexDirection="row" gap={2}>
-            {u.limits.map(l => (
-              <Box key={l.kind} flexDirection="row" gap={1}>
-                <Text dimColor>{(LIMIT_LABEL[l.kind] ?? l.kind).replace(' limit', '')}</Text>
-                {miniBar(l.percent)}
-                <Text bold color={tone(l.percent)}>{l.percent}%</Text>
-                {l.resetsAt ? <Text dimColor>{untilLabel(l.resetsAt, now)}</Text> : null}
-              </Box>
-            ))}
-          </Box>
-          <Button key="band-hide" label="Hide" variant="secondary" role="dismiss" onPress={noop} />
-        </Box>
-      </Box>
-    )
-  })
+  // The 5 hour / weekly limits now show in the session-header mod's always-on
+  // row above the prompt, so this pane stays the detailed, openable view.
 
   // ---- the meter pane ----
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {

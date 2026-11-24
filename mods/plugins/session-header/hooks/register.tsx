@@ -1,4 +1,9 @@
+import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
+
+import type { LimitInfo } from '../types'
+
+const LIMIT_LABEL: Record<string, string> = { five_hour: '5h limit', seven_day: 'Weekly limit', spend_limit: 'Spend' }
 
 // Module variables reset on a reload; nothing here needs to survive one.
 let home = ''
@@ -17,53 +22,71 @@ async function findHome($: EngineInterface): Promise<string> {
 }
 const tilde = (p: string) => (home && p.startsWith(home) ? `~${p.slice(home.length)}` : p)
 
-// The chat's own first few words, the same way the app titles a session: the
-// first real line the person typed, not a system or tool tag.
-let title = ''
-let titleLoaded = false
-async function loadTitle($: EngineInterface) {
-  if (titleLoaded) return
-  titleLoaded = true
-  try {
-    const messages = await $.session.messages()
-    const first = messages.find(m => m.role === 'user' && m.text.trim() && !m.text.trim().startsWith('<'))
-    const text = (first?.text ?? '').trim().replace(/\s+/g, ' ')
-    title = text.length > 70 ? `${text.slice(0, 70)}…` : text
-  } catch {
-    title = ''
-  }
+// Change a tag when the stored fields change: it declines what an earlier version stored.
+const limits = atom({ plugin: 'session-header', key: 'limits' } as const, [] as LimitInfo[], { shape: 'limits-1' })
+
+// How long until an ISO timestamp, as "2h 14m" / "38m" / "now".
+function untilLabel(resetsAt: string | null, nowMs: number): string {
+  if (!resetsAt) return ''
+  const ms = new Date(resetsAt).getTime() - nowMs
+  if (!Number.isFinite(ms) || ms <= 0) return 'resets now'
+  const mins = Math.round(ms / 60_000)
+  if (mins < 1) return '<1m left'
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return h > 0 ? `${h}h ${m}m left` : `${m}m left`
 }
 
+const GOOD = '#4ade80'
+const WARN = '#fbbf24'
+const BAD = '#f87171'
 const ACCENT = '#60a5fa'
+const tone = (pct: number) => (pct < 60 ? GOOD : pct < 85 ? WARN : BAD)
 
 export const register: Register = on => {
+  let running = false
+
   on('session.start', async ($, e, next) => {
     home = await findHome($)
-    void loadTitle($)
-    return next(e)
-  })
-
-  // A new user turn may be the session's first real line if it started on
-  // a tool call or a notification; refresh once the title is still empty.
-  on('turn.complete', async ($, e, next) => {
-    if (!title) {
-      titleLoaded = false
-      void loadTitle($)
+    const tick = async () => {
+      try {
+        const u = await $.session.usage()
+        const value: LimitInfo[] = u.rateLimits.map(r => ({ kind: r.kind, percent: Math.round(r.percentUsed), resetsAt: r.resetsAt ?? null }))
+        await update($, limits, () => value)
+      } catch {
+        // keep the last good reading
+      }
+    }
+    await tick()
+    if (!running) {
+      running = true
+      $.clock.every(5000, () => void tick())
     }
     return next(e)
   })
 
+  // Always on: a thin, un-hideable row with the folder and, once read, the
+  // account's 5 hour and weekly limits and when each resets.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const rest = await next(e)
     const { Box, Text } = $.ui.resolve(e)
     const cwd = await $.session.cwd().catch(() => '')
-    const folder = cwd ? (tilde(cwd).split('/').pop() || tilde(cwd)) : ''
-    if (!folder && !title) return rest
+    const folder = cwd ? tilde(cwd).split('/').pop() || tilde(cwd) : '/'
+    const ls = await read($, limits)
+    const now = await $.clock.now()
+
     return (
       <Box flexDirection="column">
-        <Box flexDirection="row" gap={1}>
-          <Text color={ACCENT}>📁 {folder || '/'}</Text>
-          {title ? <Text dimColor wrap="truncate-end"> · {title}</Text> : null}
+        <Box flexDirection="row" alignItems="center" gap={1}>
+          <Text color={ACCENT}>📁 {folder}</Text>
+          {ls.map(l => (
+            <Text key={l.kind}>
+              <Text dimColor> │ </Text>
+              <Text dimColor>{LIMIT_LABEL[l.kind] ?? l.kind} </Text>
+              <Text bold color={tone(l.percent)}>{l.percent}%</Text>
+              {l.resetsAt ? <Text dimColor> · {untilLabel(l.resetsAt, now)}</Text> : null}
+            </Text>
+          ))}
         </Box>
         {rest}
       </Box>
