@@ -35,6 +35,16 @@ function untilLabel(resetsAt: string | null, nowMs: number): string {
 
 const C = { title: '#c4b5fd', accent: '#a78bfa', blue: '#60a5fa', good: '#4ade80', warn: '#fbbf24', bad: '#f87171', border: '#6d5bd0' }
 const tone = (pct: number) => (pct < 60 ? C.good : pct < 85 ? C.warn : C.bad)
+const MINI_BAR_WIDTH = 8
+const miniBar = (p: number, width = MINI_BAR_WIDTH) => {
+  const filled = Math.round((Math.min(100, Math.max(0, p)) / 100) * width)
+  return (
+    <Text>
+      <Text color={tone(p)}>{'▰'.repeat(filled)}</Text>
+      <Text dimColor>{'▱'.repeat(width - filled)}</Text>
+    </Text>
+  )
+}
 const fmt = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : `${Math.round(n)}`)
 const pct = (v: number | null) => (v === null ? 'n/a' : `${v}%`)
 const usd = (v: number) => `$${v.toFixed(2)}`
@@ -170,28 +180,39 @@ export const register: Register = on => {
   // ---- the floating limits widget, above the prompt ----
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const rest = await next(e)
-    const hidden = await read($, bandHidden)
-    if (hidden) return rest
     const u = await read($, usage)
     if (!u || u.limits.length === 0) return rest
     const { Box, Text, Button } = $.ui.resolve(e)
-    const now = await $.clock.now()
+    const hidden = await read($, bandHidden)
     const noop = () => undefined
+
+    if (hidden) {
+      return (
+        <Box flexDirection="column">
+          {rest}
+          <Box flexDirection="row" justifyContent="flex-end">
+            <Button key="band-show" label="Limits" variant="secondary" onPress={noop} />
+          </Box>
+        </Box>
+      )
+    }
+
+    const now = await $.clock.now()
     return (
       <Box flexDirection="column">
         {rest}
-        <Box flexDirection="row" alignItems="center" justifyContent="space-between" gap={1}>
-          <Text>
-            {u.limits.map((l, i) => (
-              <Text key={l.kind}>
-                {i > 0 ? <Text dimColor>  ·  </Text> : null}
-                <Text dimColor>{(LIMIT_LABEL[l.kind] ?? l.kind).replace(' limit', '')} </Text>
+        <Box flexDirection="row" alignItems="center" justifyContent="space-between" gap={2}>
+          <Box flexDirection="row" gap={2}>
+            {u.limits.map(l => (
+              <Box key={l.kind} flexDirection="row" gap={1}>
+                <Text dimColor>{(LIMIT_LABEL[l.kind] ?? l.kind).replace(' limit', '')}</Text>
+                {miniBar(l.percent)}
                 <Text bold color={tone(l.percent)}>{l.percent}%</Text>
-                {l.resetsAt ? <Text dimColor> ({untilLabel(l.resetsAt, now)})</Text> : null}
-              </Text>
+                {l.resetsAt ? <Text dimColor>{untilLabel(l.resetsAt, now)}</Text> : null}
+              </Box>
             ))}
-          </Text>
-          <Button key="band-hide" label="Hide" role="dismiss" onPress={noop} />
+          </Box>
+          <Button key="band-hide" label="Hide" variant="secondary" role="dismiss" onPress={noop} />
         </Box>
       </Box>
     )
@@ -205,7 +226,6 @@ export const register: Register = on => {
     const t = await read($, today)
     const live = await read($, agents)
     const now = await $.clock.now()
-    const hidden = await read($, bandHidden)
     const width = Math.max(12, Math.min(36, (e.props.bodyColumns ?? 40) - 10))
     const bar = (p: number) => {
       const filled = Math.round((Math.min(100, Math.max(0, p)) / 100) * width)
@@ -240,7 +260,6 @@ export const register: Register = on => {
             </Box>
           ))}
           {u?.cost != null && <Text dimColor>≈ ${u.cost.toFixed(2)} spent (estimate)</Text>}
-          {hidden && <Button key="band-show" label="Show limits above prompt" variant="secondary" onPress={() => undefined} />}
         </Box>
 
         <Box {...card}>
