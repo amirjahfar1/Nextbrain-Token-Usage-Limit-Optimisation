@@ -39,7 +39,7 @@
       "name": "token-meter",
       "source": "./plugins/token-meter",
       "description": "Token Meter pane (context, limits with reset time, active subagents, cost, top tools, savings today) with a Full report button",
-      "version": "0.5.1"
+      "version": "0.5.2"
     },
     {
       "name": "session-header",

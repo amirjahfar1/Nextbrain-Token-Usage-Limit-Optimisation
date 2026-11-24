@@ -18,6 +18,9 @@ const today = atom({ plugin: 'token-meter', key: 'today' } as const, null, { sha
 const view = atom({ plugin: 'token-meter', key: 'view' } as const, { range: '7d', busy: false, error: '', data: null } as View, {
   shape: 'view-2',
 })
+// "Last 24h" = the weekly limit % used since the system clock's midnight (owner 2026-11-24). `startPct` = the weekly % when this local day was first seen.
+const day = atom({ plugin: 'token-meter', key: 'day' } as const, { date: '', startPct: null as number | null }, { shape: 'day-1' })
+const localDate = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const agents = atom({ plugin: 'token-meter', key: 'agents' } as const, [] as AgentSummary[], { shape: 'agents-1' })
 
 // How long until an ISO timestamp, as "2h 14m" / "38m" / "now".
@@ -103,6 +106,14 @@ export const register: Register = on => {
           folder: parts[parts.length - 1] ?? '/',
         }
         await update($, usage, () => value)
+        const wk = value.limits.find(l => l.kind === 'seven_day')?.percent
+        if (typeof wk === 'number') {
+          const dateNow = localDate()
+          const d = await read($, day)
+          // new local day, or the weekly limit reset (percent fell): the baseline is the current reading / zero
+          if (d.date !== dateNow) await update($, day, () => ({ date: dateNow, startPct: wk }))
+          else if (d.startPct !== null && wk < d.startPct) await update($, day, () => ({ date: dateNow, startPct: 0 }))
+        }
       } catch {
         // keep the last good reading
       }
@@ -172,6 +183,9 @@ export const register: Register = on => {
     const used = await read($, tools)
     const t = await read($, today)
     const live = await read($, agents)
+    const dayBase = await read($, day)
+    const wkNow = u?.limits.find(l => l.kind === 'seven_day')?.percent
+    const last24 = typeof wkNow === 'number' && dayBase.startPct !== null && dayBase.date === localDate() ? Math.max(0, wkNow - dayBase.startPct) : null
     const now = await $.clock.now()
     const width = Math.max(12, Math.min(36, (e.props.bodyColumns ?? 40) - 10))
     const bar = (p: number) => {
@@ -231,6 +245,8 @@ export const register: Register = on => {
             <Text dimColor>Reading the transcripts…</Text>
           ) : (
             <Box flexDirection="column">
+              <Text bold color={C.accent}>Last 24h: {last24 === null ? 'n/a' : `${last24}% used`}</Text>
+              <Text dimColor>{last24 === null ? 'needs the weekly limit reading' : 'of the weekly limit, from 12:00 AM (system clock)'}</Text>
               <Text>{t.sessions} sessions · cache hit {pct(t.cache_hit)}</Text>
               <Text dimColor>in {fmt(t.tokens.total_input)} · out {fmt(t.tokens.output)} · ≈ {usd(t.cost_usd)}</Text>
               <Text color={C.good}>saved {fmt(t.savings.saved_in + t.savings.saved_out)} tokens ({pct(t.savings.pct_in)})</Text>
