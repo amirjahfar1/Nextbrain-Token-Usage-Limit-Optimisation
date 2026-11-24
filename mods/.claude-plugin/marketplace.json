@@ -44,8 +44,8 @@
     {
       "name": "session-header",
       "source": "./plugins/session-header",
-      "description": "A thin, always-on row above the prompt: the current working folder plus the 5 hour and weekly limits and when each resets",
-      "version": "0.2.1"
+      "description": "A thin, always-on row above the prompt: the current working folder plus the 5 hour and weekly limits and when each resets, showing the last known limits right away in a brand new chat",
+      "version": "0.2.2"
     },
     {
       "name": "input-router",

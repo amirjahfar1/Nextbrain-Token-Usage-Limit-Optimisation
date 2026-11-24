@@ -53,11 +53,22 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     home = await findHome($)
+    // Rates come from the API's own response, empty until this session's first
+    // reading. Seed from the plugin's cross-session store so a brand new chat
+    // shows the last known numbers right away, not a blank row.
+    try {
+      const last = (await $.store.get('limits')) as LimitInfo[] | undefined
+      if (Array.isArray(last) && last.length > 0) await update($, limits, () => last)
+    } catch {
+      // No earlier reading saved yet.
+    }
     const tick = async () => {
       try {
         const u = await $.session.usage()
+        if (u.rateLimits.length === 0) return
         const value: LimitInfo[] = u.rateLimits.map(r => ({ kind: r.kind, percent: Math.round(r.percentUsed), resetsAt: r.resetsAt ?? null }))
         await update($, limits, () => value)
+        await $.store.set('limits', value)
       } catch {
         // keep the last good reading
       }
